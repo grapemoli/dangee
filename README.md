@@ -2,7 +2,10 @@
 A Web3-Based NFT Trading Platform.
 
 ## Description
-Dangee is a a Web3-based NFT trading platform with front-end and back-end interfaces and smart contracts related to minting NFTs, enabling payments, and private transactions between two entities.
+Dangee is a a Web3-based NFT trading platform with front-end and back-end interfaces and smart contracts related:
+- minting NFTs
+- enabling payments
+- private transactions between two entities
 
 This platform will be implemented and deployed using a GUI-based development environments (SIMBA Chain or Marlowe), Remix IDE, Web3 API library Moralis, and a front-end of React.
 
