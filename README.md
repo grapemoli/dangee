@@ -1,8 +1,6 @@
 # dangee
 A Web3-Based NFT Trading Platform.
 
-*To run "your" version of this dangee, please make your own ```.env``` with your Polygon API key and matic-network-credentials.*
-
 ## Description
 dangee is a Web3-based NFT trading platform (a dApp) built on the [Polygon](https://polygon.technology) blockchain. 
 The Polygon blockchain, in particular, is used due to its compatability with Ethereum while featuring much lower gas fees.
@@ -18,3 +16,10 @@ users/wallets.
 - **Front-end Framework:** React 
 - **Back-end Framework:** MoralisAPI
 - hardhat (for smart contract development)
+
+## Running
+### Smart Contract Development
+Go to the ```hardhat-test``` directory. 
+
+1. Run ```npm install``` to install all dependencies.
+2. Create your ```.env``` with your Polygon API key and matic-network-credentials.
