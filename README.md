@@ -2,13 +2,17 @@
 A Web3-Based NFT Trading Platform.
 
 ## Description
-Dangee is a a Web3-based NFT trading platform with front-end and back-end interfaces and smart contracts related:
-- minting NFTs
-- enabling payments
-- private transactions between two entities
+dangee is a Web3-based NFT trading platform (a dApp) built on the [Polygon](https://polygon.technology) blockchain. 
+The Polygon blockchain, in particular, is used due to its compatability with Ethereum while featuring much lower gas fees.
 
-This platform will be implemented and deployed using a GUI-based development environments (SIMBA Chain or Marlowe), Remix IDE, Web3 API library Moralis, and a front-end of React.
+User's are able to register onto the platform using Web3 Authentication (i.e., their wallets). Outside of authentication,
+the user is able to:
+1. interact with smart contracts in the way of minting NFTs, and 
+2. trade/sell NFTs privately with other
+users/wallets.
 
-The front end will enable the clients to register to our platform and interact with the smart contracts. Such an NFT trading platform will be tested, during which providers like MetaMask can be used for authentication. 
-
-This project aims to gain a better understanding of Web-3 and its advantages, which include better-personalized experiences for the users (contents and services tailored to users’ needs), seamless interoperability, and intelligent search and data integration.
+## Technologies
+- Node.js version 20
+- **Front-end Framework:** React 
+- **Back-end Framework:** MoralisAPI
+- hardhat (for smart contract development)
