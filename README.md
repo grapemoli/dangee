@@ -1,7 +1,7 @@
 # dangee
 A Web3-Based NFT Trading Platform.
 
-*To run "your" version of this dangee, please replace the placeholder API key. For all intents and purposes, my actual API key is NOT in this repository.*
+*To run "your" version of this dangee, please make your own ```.env``` with your Polygon API key and matic-network-credentials.*
 
 ## Description
 dangee is a Web3-based NFT trading platform (a dApp) built on the [Polygon](https://polygon.technology) blockchain. 
