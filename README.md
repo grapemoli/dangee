@@ -12,14 +12,16 @@ the user is able to:
 users/wallets.
 
 ## Technologies
-- Node.js version 20
+- Requires Node.js version 20+
 - **Front-end Framework:** React 
 - **Back-end Framework:** MoralisAPI
-- hardhat (for smart contract development)
+- hardhat 
+- dotenv
 
 ## Running
+Before proceeding, please make a MetaMask account, and add the [Polygon mainnet and testnet to your networks](https://docs.polygon.technology/tools/wallets/metamask/add-polygon-network/).
 ### Smart Contract Development
-Go to the ```hardhat-test``` directory. 
+Go to the ```smart-contracts``` directory. 
 
-1. Run ```npm install``` to install all dependencies.
+1. Run ```npm install```.
 2. Create your ```.env``` with your Polygon API key and matic-network-credentials.
