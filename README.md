@@ -25,3 +25,4 @@ Go to the ```smart-contracts``` directory.
 
 1. Run ```npm install```.
 2. Create your ```.env``` with your Polygon API key and matic-network-credentials.
+3. Run ```npx hardhat compile``` and ```npx hardhat test``` to run the test cases against the smart contracts.
