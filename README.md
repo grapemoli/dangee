@@ -27,15 +27,17 @@ are not registered with the platform (more on this later).
 ## Development
 Before proceeding, please make a MetaMask account, and add the [Polygon mainnet and testnet to your networks](https://docs.polygon.technology/tools/wallets/metamask/add-polygon-network/). You will also need a [PolygonScan](https://polygonscan.com/) account.
 ### .env
+#### smart-contract/.env
 You will need the following information in ```smart-contracts/.env```:
 - ```PRIVATE_KEY```: the private key of the wallet associated with Mumbai.
 - ```POLYGONSCAN_API_KEY```: API key from your [PolygonScan account](https://polygonscan.com/).
 
 ### Smart Contract Development
+For more information, please see refer to the ```smart-contract``` directory's [README](https://github.com/grapemoli/dangee/tree/main/smart-contracts).
 #### Testing Smart Contracts
 Go to the ```smart-contracts``` directory. 
 
 1. Run ```npm install```
 2. In ```hardhat.config.js```, change the ```defaultNetwork``` to hardhat, polyogn_mumbai, or your network of choice.
-2. Create your ```.env``` with your Polygon API key and matic-network-credentials.
+2. Create your ```smart-contract/.env``` with your Polygon API key and matic-network-credentials.
 3. Run ```npx hardhat compile``` and ```npx hardhat test``` to run the test cases against the smart contracts.
