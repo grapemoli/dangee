@@ -17,7 +17,7 @@ describe ("Item Contract", function () {
        });
 
         it ("canMint () should return true", async function () {
-            const [owner, minter, other] = await ethers.getSigners ();
+            const [owner] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
 
             expect (await ItemContract.canMint ()).to.equal (true);
@@ -37,14 +37,14 @@ describe ("Item Contract", function () {
         });
 
         it ("canMint () should return false", async function () {
-            const [owner, minter, other] = await ethers.getSigners ();
+            const [owner, other] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
 
             expect (await ItemContract.connect (other).canMint ()).to.equal (false);
         });
 
         it ("MINT_ROLE can be granted to non-minters", async function () {
-            const [owner, minter, other] = await ethers.getSigners ();
+            const [owner, other] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
 
             await ItemContract.grantMintRole (other);
@@ -79,9 +79,9 @@ describe ("Item Contract", function () {
 
             await ItemContract.safeMint (owner, tokenURI);
 
-            await expect (ItemContract.updatePrice (tokenId, price))
+            await expect (ItemContract.updatePrice (tokenId, price + 1))
                 .to.emit (ItemContract, "PriceUpdate")
-                .withArgs (owner, tokenId, 0, price);
+                .withArgs (owner, tokenId, 0, price + 1);
         });
 
         it ("updatePrice should update price map", async function () {
@@ -93,9 +93,9 @@ describe ("Item Contract", function () {
             const price = 110;
 
             await ItemContract.safeMint (owner, tokenURI);
-            await ItemContract.updatePrice (tokenId, 110);
+            await ItemContract.updatePrice (tokenId, price + 1);
 
-            expect (await ItemContract.getPrice (tokenId)).to.be.equal (price);
+            expect (await ItemContract.getPrice (tokenId)).to.be.equal (price + 1);
         });
 
         it ("Only owner [or admin] of NFT should change price", async function () {
@@ -104,13 +104,12 @@ describe ("Item Contract", function () {
 
             const tokenURI = "test_nft";
             const tokenId = await ItemContract.totalItems ();
-            const price = 110;
 
             await ItemContract.safeMint (owner, tokenURI);
             await ItemContract.grantMintRole (other);
             await ItemContract.updatePrice (tokenId, 110);
 
-            await expect (ItemContract.connect (other).updatePrice (tokenId, 110))
+            await expect (ItemContract.connect (other).updatePrice (tokenId, 111))
                 .to.be.revertedWith ("You are not the owner of this NFT");
         });
 
@@ -120,7 +119,6 @@ describe ("Item Contract", function () {
 
             const tokenURI = "test_nft";
             const tokenId = await ItemContract.totalItems ();
-            const price = 110;
 
             await ItemContract.grantMintRole (other);
             await ItemContract.connect (other).safeMint (other, tokenURI);
@@ -138,7 +136,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             expect (await ItemContract.getPrice (tokenId)).to.be.equal (price);
         });
@@ -151,7 +149,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             expect (await ItemContract.connect (others).getPrice (tokenId)).to.be.equal (price);
         });
@@ -164,7 +162,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             expect (await ItemContract.connect (others).isSelling (tokenId)).to.be.equal (true);
         });
@@ -197,36 +195,50 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
             await ItemContract.setSelling (tokenId, false);
             expect (await ItemContract.connect (others).isSelling (tokenId)).to.be.equal (false);
         });
 
         it ("Should be able to turn on selling", async function (){
-            const [owner, others] = await ethers.getSigners ();
+            const [owner] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
 
             const tokenURI = "test_nft";
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
             await ItemContract.setSelling (tokenId, true);
             expect (await ItemContract.isSelling (tokenId)).to.be.equal (true);
         });
 
         it ("Should be able to update price", async function (){
-            const [owner, others] = await ethers.getSigners ();
+            const [owner] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
 
             const tokenURI = "test_nft";
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
             await ItemContract.updatePrice (tokenId, 1234);
 
             expect (await ItemContract.getPrice (tokenId)).to.be.equal (1234);
+        });
+
+        it ("Should not be able to update price if updating to the same price", async function () {
+            const [owner] = await ethers.getSigners ();
+            const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
+
+            const tokenURI = "test_nft";
+            const tokenId = await ItemContract.totalItems ();
+            const price = 110;
+
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
+
+            await expect (ItemContract.updatePrice (tokenId, price))
+                .to.be.revertedWith ('Already this price.');
         });
 
         it ("Should not be able to update price if not NFT owner", async function (){
@@ -237,7 +249,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             await expect (ItemContract.connect (others).updatePrice (tokenId, 0))
                 .to.be.revertedWith ('You are not the owner of this NFT');
@@ -251,7 +263,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             expect (await ItemContract.connect (others).getURI (tokenId)).to.be.equal (tokenURI);
         });
@@ -264,20 +276,20 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             expect (await ItemContract.connect (others).getSeller (tokenId)).to.be.equal (owner);
         });
 
         it ("Should fire ItemForSale event", async function (){
-            const [owner, others] = await ethers.getSigners ();
+            const [owner] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
 
             const tokenURI = "test_nft";
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             await expect (ItemContract.setSelling (tokenId, true))
                 .to.emit (ItemContract, "ItemForSale")
@@ -292,7 +304,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 110;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             await expect (ItemContract.updatePrice (tokenId, 1234))
                 .to.emit (ItemContract, "PriceUpdate")
@@ -309,7 +321,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 10;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             // NOTE that we use changeEtherBalances() instead of changeTokenBalances() to measure
             // the change in currency, whereas the change in token balance will always be -1/1 for the
@@ -326,7 +338,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 1;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
             await ItemContract.connect (others).buy (tokenId, {value: price});
 
             expect (await ItemContract.getSeller (tokenId)).to.be.equal (others);
@@ -340,7 +352,8 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 100;
 
-            await ItemContract.safeMintWithPrice (others, tokenURI, price);
+            await ItemContract.safeMintWithPrice (others, tokenURI, price, false);
+            await ItemContract.connect (others).setSelling (tokenId, true);
 
             await expect (ItemContract.connect (owner).buy (tokenId, {value: price}))
                 .to.emit (ItemContract, "ItemSold")
@@ -355,8 +368,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 100;
 
-            await ItemContract.safeMintWithPrice (others, tokenURI, price);
-            await ItemContract.connect (others).setSelling (tokenId, false);
+            await ItemContract.safeMintWithPrice (others, tokenURI, price, false);
 
             await expect (ItemContract.connect (owner).buy (tokenId, {value: price}))
                 .to.be.revertedWith ('Seller is not selling NFT.');
@@ -370,7 +382,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 100;
 
-            await ItemContract.safeMintWithPrice (others, tokenURI, price);
+            await ItemContract.safeMintWithPrice (others, tokenURI, price, true);
 
             await expect (ItemContract.connect (others).buy (tokenId, {value: price}))
                 .to.be.revertedWith ('You already own this NFT.');
@@ -384,7 +396,7 @@ describe ("Item Contract", function () {
             const tokenId = await ItemContract.totalItems ();
             const price = 100;
 
-            await ItemContract.safeMintWithPrice (owner, tokenURI, price);
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
 
             await expect (ItemContract.connect (others).buy (tokenId, {value: price - 1}))
                 .to.be.revertedWith ('Paid less than the amount listed.');

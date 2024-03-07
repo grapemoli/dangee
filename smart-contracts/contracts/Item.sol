@@ -80,6 +80,7 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
     function updatePrice (uint256 tokenId, uint256 newPrice) public {
         require (msg.sender == ownerOf (tokenId) || hasRole (DEFAULT_ADMIN_ROLE, msg.sender), "You are not the owner of this NFT");
         require (newPrice > 0, "Please set a price greater than 0.");
+        require (newPrice != _listingMap [tokenId].price, "Already this price.");
 
         uint256 oldPrice = _listingMap [tokenId].price;
         _listingMap [tokenId].price = newPrice;
@@ -111,14 +112,15 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
         _setTokenURI (tokenId, uri);
 
         // Set the mappings. By default, the price is 0. Note that the NFT is automatically
-        // placed on the market to sell.
-        _listingMap [tokenId] = Listing (uri, payable (to), 0, true);
+        // placed to not sell on the market, as the price is still 0.
+        _listingMap [tokenId] = Listing (uri, payable (to), 0, false);
 
         emit NewItem (to, tokenId, 0);
     }
 
-    // @override safeMint () to allow the caller to include the price of the NFT being minted.
-    function safeMintWithPrice (address to, string memory uri, uint256 price) public onlyRole (MINTER_ROLE) {
+    // @override safeMint () to allow the caller to include the price of the NFT being minted. The
+    // caller can also choose whether or not to have the NFT be sellable on the market.
+    function safeMintWithPrice (address to, string memory uri, uint256 price, bool onMarket) public onlyRole (MINTER_ROLE) {
         // Before minting, that we don't already have the max number of NFTs on the platform.
         require (_nextTokenId <  (2^256 - 1), 'Reached max number of NFTs.');
         require (price > 0, 'Price should be greater than 0.');
@@ -127,9 +129,9 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
         _safeMint (to, tokenId);
         _setTokenURI (tokenId, uri);
 
-        // Set the mappings. Note that the NFT is automatic set to be listed on the
-        // marketplace.
-        _listingMap [tokenId] = Listing (uri, payable (to), price, true);
+        // Set the mappings. Note that the NFT is automatic automatically set to sell on
+        // the marketplace because the price is set.
+        _listingMap [tokenId] = Listing (uri, payable (to), price, onMarket);
 
         emit NewItem (to, tokenId, 0);
     }
@@ -140,12 +142,14 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
     // function). "Selling" means that seller gets the funds from the buyer, and then the
     // ownership is transferred to the buyer.
     function buy (uint256 tokenId) public payable {
+        uint256 price = _listingMap [tokenId].price;
+
         // The buyer must send at least the amount that the seller is asking for.
         require (_listingMap [tokenId].selling == true, "Seller is not selling NFT.");
-        require (msg.value >= _listingMap [tokenId].price, "Paid less than the amount listed.");
+        require (msg.value >= price, "Paid less than the amount listed.");
         require (msg.sender != ownerOf (tokenId), "You already own this NFT.");
+        require (price > 0, 'Seller needs to set price greater than 0.');
 
-        uint256 price = _listingMap [tokenId].price;
         address seller = _listingMap [tokenId].seller;
 
         // Send the seller the money, then transfer ownership. Update listing.
