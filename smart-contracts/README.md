@@ -92,6 +92,8 @@ the one account in the ```.env```.
 ```script
 npx hardhat run scripts/deploy.js --network mumbai
 ```
+5. Verify your smart contract. You can do so directly on PolygonScan, or by Hardhat via terminal commands. See [here](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify)
+for the Hardhat method, which I found to be more successful.
 
 ### Minting NFTs 
 For the most part, the front-end will be slated to take care of IPFS-related processes regarding
