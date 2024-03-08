@@ -24,20 +24,33 @@ The **MINT_ROLE** role allows the smart contract to essentially keep track of th
 who are signed onto the platform are automatically given the **MINT_ROLE** access. In turn, this means that users with such role
 are not registered with the platform (more on this later).
 
+## Interacting with dangee
+Coming soon...
+
 ## Development
-Before proceeding, please make a MetaMask account, and add the [Polygon mainnet and testnet to your networks](https://docs.polygon.technology/tools/wallets/metamask/add-polygon-network/). You will also need a [PolygonScan](https://polygonscan.com/) account.
-### .env
+
+### Front End Development
+Coming soon...
+
+### Smart Contract Development
+Before proceeding, please make a MetaMask account (or any wallet), and add the [Polygon mainnet and testnet to your networks](https://docs.polygon.technology/tools/wallets/metamask/add-polygon-network/). You will also need a [PolygonScan](https://polygonscan.com/) 
+account. If you'd like to mint NFT's with non-existing images, a [Pinata API](https://app.pinata.cloud/) account will also needed to be made.
+
+For more information, refer to the [```smart-contract``` directory](https://github.com/grapemoli/dangee/tree/main/smart-contracts).
+
 #### smart-contract/.env
 You will need the following information in ```smart-contracts/.env```:
 - ```PRIVATE_KEY```: the private key of the wallet associated with Mumbai.
 - ```POLYGONSCAN_API_KEY```: API key from your [PolygonScan account](https://polygonscan.com/).
+- ```WALLET_ADDRESS```: your public MetaMask wallet's address. Add as many as needed.
+- ```PINATA_API_KEY```: your Pinata API key.
 
-### Smart Contract Development
-For more information, please see refer to the ```smart-contract``` directory's [README](https://github.com/grapemoli/dangee/tree/main/smart-contracts).
-#### Testing Smart Contracts
+#### General Setup & Compilation
 Go to the ```smart-contracts``` directory. 
 
 1. Run ```npm install```
-2. In ```hardhat.config.js```, change the ```defaultNetwork``` to hardhat, polyogn_mumbai, or your network of choice.
+2. In ```hardhat.config.js```, change the ```defaultNetwork``` to Hardhat, Mumbai, or your network of choice.
 2. Create your ```smart-contract/.env``` with your Polygon API key and matic-network-credentials.
 3. Run ```npx hardhat compile``` and ```npx hardhat test``` to run the test cases against the smart contracts.
+4. Run ```npx hardhat run scripts/deploy.js --network {networkName}``` to deploy to the blockchain.
+
