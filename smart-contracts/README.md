@@ -94,11 +94,13 @@ npx hardhat run scripts/deploy.js --network mumbai
 ```
 5. Verify your smart contract. You can do so directly on PolygonScan, or by Hardhat via terminal commands. See [here](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify)
 for the Hardhat method, which I found to be more successful.
+6. You can then see the smart contract contents, and interact with it directly on PolygonScan. Alternatively, you can configure
+the ```scripts/testnet.js``` file to deploy a testnet-interacting script.
 
 ### Minting NFTs 
 For the most part, the front-end will be slated to take care of IPFS-related processes regarding
 NFT minting. The NFT, itself, is not stored on the blockchain. Instead, the IPFS hash is stored on the
 blockchain, which when used in the IPFS "url", we can bring up the NFT image and metadata.
 
-We use Pinata API to easily work with IPFS. 
+We use Pinata API to easily work with IPFS.
 
