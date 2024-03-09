@@ -1,15 +1,17 @@
 # Smart Contracts
+Mumbai Address:```0x005e3E29DCC8a11B28C64f49BbBf338856e2cC4b```
+
 The core of the dangee dApp: smart contracts deployed on the Polygon blockchain.
 
 The structure of the dictionary is: 
 - **contracts/** - ERC721 smart contracts, written for Solidity 8.20 with the help of [OpenZeppelin 5.0.0](https://www.openzeppelin.com/contractsv).
-- **scripts/** - scripts are used for deploying the smart contract(s) to a test/real network
+- **scripts/** - scripts are used for deploying the smart contract(s) to a test/real network.
 - **tests/** - tests using [Chai](https://www.chaijs.com), with the [hardhat-chai-matchers](https://hardhat.org/hardhat-chai-matchers/docs/reference) plugin. 
 
 ## Development
 Before proceeding, please make a MetaMask account, and add the Polygon mainnet and testnet to your networks. You will also need a PolygonScan account.
-1. Run ```npm install``` to install all dependencies
-2. Please make sure you're running  **Node v20**
+1. Please make sure you're running  **Node v20**
+2. Run ```npm install``` to install all dependencies
 
 ### Prerequisites
 #### .env
@@ -19,14 +21,29 @@ You will need the following information in smart-contracts/.env:
 - **POLYGONSCAN_API_KEY**: API key from your PolygonScan account.
 
 ```shell
-PRIVATE_KEY = // insert private key
-POLYGONSCAN_API_KEY = // insert private api key
+PRIVATE_KEY = "walletPrivateAPIKey"
+WALLET_ADDRESS = "walletPublicKey"
+POLYGONSCAN_API_KEY = "PolygonScanAPIKey"
+
+PINATA_API_KEY = "PinataAPIKey"
+GATEWAY_PRE = "https://bronze-high-limpet-121.mypinata.cloud/ipfs/"
+GATEWAY_POST = "?pinataGatewayToken={yourToken}"
+
+TESTNET_ADDRESS = "smartContractAddressOnTestnet"
+
+...
+...
+
+# Add as many wallets as needed.
+PRIVATE_KEY_2 = "wallet2PrivateKey"
+WALLET_2_ADDRESS = "wallet2PublicKey"
 ```
 
 #### hardhat.config.js
 Note that ```hardhat.config.js``` uses the ```default_network``` value to set the
-network that the smart contract is deployed on. Make sure to change this variable
-accordingly based on which network you wish to use.
+network that the smart contract is deployed on. You can change the network hardhat will
+use by changing this attribute, or by appending ```--network {networkNameInConfig}``` 
+at the end of terminal commands.
 ```shell
 require('dotenv').config();
 require("@nomicfoundation/hardhat-ethers");
@@ -40,7 +57,7 @@ module.exports = {
     },
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
-      accounts: [process.env.PRIVATE_KEY]
+      accounts: [process.env.PRIVATE_KEY, process.end.PRIVATE_KEY2, ...]
     }
   },
   etherscan: {
@@ -98,9 +115,11 @@ for the Hardhat method, which I found to be more successful.
 the ```scripts/testnet.js``` file to deploy a testnet-interacting script.
 
 ### Minting NFTs 
-For the most part, the front-end will be slated to take care of IPFS-related processes regarding
-NFT minting. The NFT, itself, is not stored on the blockchain. Instead, the IPFS hash is stored on the
+For the most part, the front-end will be slated to take care of IPFS-related processes. "Front-end," here refers to using 
+[Piñata API](https://www.pinata.cloud). 
+
+The NFT, itself, is not stored on the blockchain. Instead, the IPFS hash is stored on the
 blockchain, which when used in the IPFS "url", we can bring up the NFT image and metadata.
 
-We use Pinata API to easily work with IPFS.
+
 
