@@ -1,6 +1,4 @@
 # Smart Contracts
-Mumbai Address:```0x005e3E29DCC8a11B28C64f49BbBf338856e2cC4b```
-
 The core of the dangee dApp: smart contracts deployed on the Polygon blockchain.
 
 The structure of the dictionary is: 
@@ -8,6 +6,9 @@ The structure of the dictionary is:
 - **scripts/** - scripts are used for deploying the smart contract(s) to a test/real network.
 - **tests/** - tests using [Chai](https://www.chaijs.com), with the [hardhat-chai-matchers](https://hardhat.org/hardhat-chai-matchers/docs/reference) plugin. 
 
+> Mumbai Address: ```0x005e3E29DCC8a11B28C64f49BbBf338856e2cC4b```
+>
+> View and interact with the smart contract [here](https://mumbai.polygonscan.com/address/0x005e3E29DCC8a11B28C64f49BbBf338856e2cC4b).
 ## Development
 Before proceeding, please make a MetaMask account, and add the Polygon mainnet and testnet to your networks. You will also need a PolygonScan account.
 1. Please make sure you're running  **Node v20**
@@ -40,9 +41,10 @@ WALLET_2_ADDRESS = "wallet2PublicKey"
 ```
 
 #### hardhat.config.js
-Note that ```hardhat.config.js``` uses the ```default_network``` value to set the
-network that the smart contract is deployed on. You can change the network hardhat will
-use by changing this attribute, or by appending ```--network {networkNameInConfig}``` 
+> **Note**: ```hardhat.config.js``` uses the ```default_network``` value to set the
+network that the commands will interact with 
+>
+> You can change the network Hardhat uses by changing this attribute in the config, or by appending ```--network {networkNameInConfig}``` 
 at the end of terminal commands.
 ```shell
 require('dotenv').config();
@@ -81,7 +83,7 @@ before deploying on a live testnet.
 1. To compile your smart contracts, run ```npx hardhat compile```
 2. To run your tests against the smart contracts, run ```npx hardhat test```
 
-- Note: You can append ```/{fileName}``` to compile or test specific files.
+> **Note**: You can append ```/{fileName}``` to compile or test specific files.
 
 #### Useful Hardhat Commands
 ```shell
@@ -94,7 +96,7 @@ npx hardhat run --network <your-network> scripts/deploy.js  # You can use any ne
 ```
 
 ### Compiling & Testing on Mumbai
-**Note**: To test your smart contract methods, you may need two wallets.
+>**Note**:  To test your smart contract methods, you may need at least two wallets.
 
 The Polygon test network allows users to test how much deploying and running 
 their smart contracts may cost without needing actual MATIC. Instead, "test" MATIC
