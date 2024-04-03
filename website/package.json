@@ -9,12 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "primeicons": "^7.0.0",
     "primevue": "^3.50.0",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "web3": "^4.7.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
+    "sass": "^1.72.0",
     "vite": "^5.1.6"
   }
 }
