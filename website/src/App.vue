@@ -1,11 +1,22 @@
+<!-- JavaScript -->
 <script setup>
-import TopBanner from './components/TopBanner.vue'
+import { RouterView } from 'vue-router';
+import TopBanner from './components/TopBanner.vue';
 </script>
 
+<!-- HTML -->
 <template>
-  <TopBanner></TopBanner>
+  <header>
+    <TopBanner></TopBanner>
+  </header>
+
+  <main>
+    <!-- Makes sure to display the route's view. -->
+    <RouterView></RouterView>
+  </main>
 </template>
 
+<!-- CSS -->
 <style scoped lang="scss">
 body {
   background-color: var(--surface-0);

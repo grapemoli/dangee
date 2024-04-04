@@ -1,7 +1,6 @@
-<script setup>
+<script>
 </script>
 
 <template>
-  <main>
-  </main>
+  <p>Hello from home.</p>
 </template>

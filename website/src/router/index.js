@@ -1,6 +1,9 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/LoginView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '../views/HomeView.vue';
+import LoginView from '../views/LoginView.vue';
+import LogoutView from '../views/LogoutView.vue';
+import DashboardView from '../views/DashboardView.vue';
+import store from '../store/index.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,16 +26,38 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+      beforeEnter: (to, from, next) => {
+        // If the user is already logged in, reject the navigation.
+        if (store.getters['isAuth']) {
+          next('/');
+        }
+        else {
+          next();
+        }
+      },
     },
-
-    // TODO Uncomment these paths as they are made.
-    /*
     {
       path: '/logout',
       name: 'logout',
-      component: LogoutView
+      component: LogoutView,
+      beforeEnter: (to, from, next) => {
+        // If the user is logged out, reject the navigation.
+        if (store.getters['isAuth']) {
+          next();
+        }
+        else {
+          next('/');
+        }
+      },
     },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: DashboardView,
+    },
+      // TODO uncomment these paths as they are made.
+      /*
     {
       path: '/marketplace',
       name: 'marketplace',
@@ -62,6 +87,6 @@ const router = createRouter({
     }
     */
   ]
-})
+});
 
-export default router
+export default router;
