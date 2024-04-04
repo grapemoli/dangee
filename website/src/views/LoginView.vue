@@ -16,7 +16,7 @@ onBeforeMount(() => {
   if (window.ethereum) {
 
     // Create Web3 instance.
-    window.web3 = new Web3 (window.ethereum);
+    const web3 = new Web3 (window.ethereum);
     errorMsg.value = "";
     isDisabled.value = false;
   } else {
@@ -31,9 +31,7 @@ onBeforeMount(() => {
 // Event handler for logging in with wallet.
 // 1. Web3 login function
 const loginWithEth = async () => {
-  // The global window.web3 instance is only made when we detect a MetaMask account upon
-  // entering the page.
-  if (window.web3) {
+  if (web3) {
     try {
       // Get the user's [ethereum] account - prompts MetaMask to login.
       const selectedAccount = await window.ethereum

@@ -25,8 +25,8 @@ export default createStore({
     actions: {
         // Signs in all wallets on the MetaMask extension that are registered onto dangee.
         login(context, walletId) {
-            window.userWalletAddress = walletId[0];
-            window.localStorage.setItem("userWalletAddress", walletId[0]);
+            window.userWalletAddress = walletId;
+            window.localStorage.setItem("userWalletAddress", walletId);
             context.commit("update_auth", walletId);
         },
 
