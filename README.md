@@ -24,12 +24,14 @@ The **MINT_ROLE** helps to gate access to minting only to those with permission.
 spam minting. As of right now, the **MINT_ROLE** is granted to those who connect their wallet to the platform.
 
 ## Interacting with dangee
-Coming soon...
+Future plans are to deploy dangee onto Microsoft Azure; however, as of yet, dangee remains on the localhost.
 
 ## Development
 
 ### Front End Development
-Coming soon...
+Please note that dangee is currently working on the Mumbai testnet, so all transactions and NFT minting are occuring on the testnet.
+
+For more information, refer to the [```website``` directory](https://github.com/grapemoli/dangee/tree/main/website).
 
 ### Smart Contract Development
 For more information, refer to the [```smart-contract``` directory](https://github.com/grapemoli/dangee/tree/main/smart-contracts).

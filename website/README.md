@@ -1,10 +1,25 @@
 # website
+An SPA created by Vue3, this website enables:
+- Web3 authentication (i.e., logging in with your wallet),
+- viewing the marketplace,
+- trading/selling NFTs, and
+- minting NFTs.
 
-This template should help get you started developing with Vue 3 in Vite.
+## Web3 Authentication
+We currently only support the MetaMask wallet, as Web3 authentication was done via the [MetaMask API](https://docs.metamask.io/).
 
-## Recommended IDE Setup
+Under the MetaMask method, users are asked to allow their wallet to access dangee. After the user accepts this, the user will
+not be prompted to 'allow' dangee to see their wallet again unless their wallet is disconnected.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+> To disconnect a wallet is not the same as to 'logout' of dangee.
+
+
+While users are given the option to "logout," this only removes the data stored on the window browser. To _disconnect_ a wallet,
+**the user must manually disconnect their wallet** within MetaMask. If the user disconnects their wallet, then when logging into dangee,
+they will be asked once again if they would like to 'allow' dangee to see their wallet.
+
+Lastly, dangee does support accounts that have multiple wallets. You can switch between them as needed,
+and dangee will re-render as you do.
 
 ## Customize configuration
 
@@ -17,10 +32,11 @@ npm install
 ```
 
 ### Compile and Hot-Reload for Development
-
+Note that the project is hosted on [localhost:5137](http://localhost:5173/).
 ```sh
 npm run dev
 ```
+
 
 ### Compile and Minify for Production
 
