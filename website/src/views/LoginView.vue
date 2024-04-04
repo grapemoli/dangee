@@ -49,7 +49,7 @@ const loginWithEth = async () => {
       // This code facilitates the user changing their account (if they have multiple).
       // Update the store.
       window.ethereum.on('accountsChanged', function (selectedAccount) {
-        store.dispatch('login', selectedAccount);
+        store.dispatch('login', selectedAccount[0]);
       });
 
       // Otherwise, login the user like normal & set the state (the store takes care of both).

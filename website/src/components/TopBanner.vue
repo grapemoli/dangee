@@ -81,8 +81,9 @@ onMounted(() => {
     menuItems.value[3].items[1].icon = 'pi pi-sign-in';
     menuItems.value[3].items[1].route = '/login';
   }
-})
+});
 
+// Watches for if the user logs in to change the login/logout button.
 watch (isAuthed, () => {
   // Toggle the login vs logout option.
   if (isAuthed.value) {
@@ -97,7 +98,7 @@ watch (isAuthed, () => {
     menuItems.value[3].items[1].icon = 'pi pi-sign-in';
     menuItems.value[3].items[1].route = '/login';
   }
-})
+});
 </script>
 
 

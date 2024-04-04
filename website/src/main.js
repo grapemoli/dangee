@@ -48,8 +48,10 @@ app.use(PrimeVue, {
     inputStyle: 'outlined'
 });
 
-app.component('Card', Card);
 app.component('Button', Button);
+app.component('Card', Card);
+app.component('Image', Image);
+app.component('Menubar', Menubar);
 app.component('ProgressSpinner', ProgressSpinner);
 app.component('ToggleButton', ToggleButton);
 
@@ -60,8 +62,7 @@ app.use(ToastService);
 
 app.component('Divider', Divider);
 app.component('TabMenu', TabMenu);
-app.component('Menubar', Menubar);
-app.component('Image', Image);
+
 
 
 
