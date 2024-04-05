@@ -1,14 +1,30 @@
 <!-- JavaScript -->
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed, onBeforeMount } from 'vue';
 import { useStore } from 'vuex'
 
 const store = useStore();
 
 const walletId = computed(() => store.getters["userId"]);
 const isAuth = computed(() => store.getters["isAuth"]);
-const balance = computed(() => store.getters["balance"]);
+const balance = ref(0);
 
+
+if (window.ethereum && isAuth.value) {
+  const web3 = new Web3(window.ethereum);
+  web3.eth.getBalance(store.getters['userId']).then((result) => {
+    balance.value = web3.utils.fromWei(result, "ether");
+  });
+}
+
+watch((walletId) => {
+  if (window.ethereum && isAuth.value) {
+    const web3 = new Web3(window.ethereum);
+    web3.eth.getBalance(store.getters['userId']).then((result) => {
+      balance.value = web3.utils.fromWei(result, "ether");
+    });
+  }
+})
 </script>
 
 
@@ -32,7 +48,7 @@ const balance = computed(() => store.getters["balance"]);
 
         <tr>
           <th><h3>Balance (MATIC)</h3></th>
-          <th v-if="isAuth" class="data">{{ balance }}</th>
+          <th v-if="isAuth" class="data" id='balance'>{{ balance }}</th>
           <th v-else class="data">Not signed in.</th>
         </tr>
       </table>

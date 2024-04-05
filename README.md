@@ -11,6 +11,11 @@ the user is able to:
 2. mint and sell NFTs privately with other
 users/wallets.
 
+## Wallets
+Please make a MetaMask wallet, and add/keep the MetaMask wallet to your account:
+![Screenshot 2024-04-04 at 5.49.46 PM.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F23%2Fjc9pcnfd10q2q27zck3k27vh0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_pY0MU2%2FScreenshot%202024-04-04%20at%205.49.46%E2%80%AFPM.png)
+
+
 ### User Roles
 There are two, technically three, roles on the smart contracts.
 1. **DEFAULT_ADMIN** - the original creator of the contract (me)

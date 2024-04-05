@@ -1,12 +1,22 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
+const web3 = new Web3(window.ethereum);
 
 
 // This store is mainly used for user authentication.
 export default createStore({
     // State for state (global data).
     state: {
+        // Information of the chain.
+        chainId: 80001,
+        rpc: 'https://polygon-mumbai-bor-rpc.publicnode.com',
+        tokenName: 'MATIC',
+        tokenDecimals: 18,
+        tokenSymbol: 'MATIC',
+        chainName: 'Polygon Mumbai Testnet',
+
+        // Information of user authentication.
         isAuth: !!!!window.localStorage.getItem("userWalletAddress"),
-        userId: window.localStorage.getItem("userWalletAddress")
+        userId: window.localStorage.getItem("userWalletAddress"),
     },
     // Mutations commit the data.
     mutations: {
@@ -48,11 +58,29 @@ export default createStore({
     },
     // Getters store computed properties.
     getters: {
+        chainId: function(state) {
+            return state.chainId;
+        },
+        rpc: function(state) {
+            return state.rpc;
+        },
+        tokenName: function(state) {
+            return state.tokenName;
+        },
+        tokenDecimals: function(state) {
+            return state.tokenDecimals;
+        },
+        tokenSymbol: function(state) {
+            return state.tokenSymbol;
+        },
+        chainName: function(state) {
+            return state.chainName;
+        },
         isAuth: function(state) {
             return state.isAuth;
         },
         userId: function(state) {
             return state.userId;
-        }
+        },
     }
 })

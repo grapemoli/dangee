@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import LogoutView from '../views/LogoutView.vue';
 import DashboardView from '../views/DashboardView.vue';
+import MarketplaceView from '../views/MarketplaceView.vue';
 import store from '../store/index.js'
 
 const router = createRouter({
@@ -57,11 +58,12 @@ const router = createRouter({
       component: DashboardView,
     },
       // TODO uncomment these paths as they are made.
-      /*
     {
       path: '/marketplace',
       name: 'marketplace',
-      component: MarketplaceView,
+      component: MarketplaceView
+    }
+      /*
       children: [
         {
           path: '/sell',
@@ -80,6 +82,7 @@ const router = createRouter({
         }
       ]
     },
+      /*
     {
       path: '/library',
       name: 'library',

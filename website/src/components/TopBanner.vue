@@ -41,7 +41,7 @@ const menuItems = ref([
   {
     label: 'Market',
     icon: 'pi pi-bitcoin',
-    route: '/login'
+    route: '/marketplace'
   },
   {
     label: 'Library',

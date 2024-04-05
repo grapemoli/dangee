@@ -18,7 +18,6 @@ const disabled = ref(false);
 // Logout event handler. Removes the global API of the global address, and set the cached data to null.
 // Below are the popup dialogs & event handler upon clicking logout.
 const cancel = () => {
-
   router.push({path: '/'});
 };
 

@@ -11,6 +11,10 @@ app.use(router);
 
 // Web3 Authentication. For now, we set the chain to the Mumbai testnet; however,
 // be sure to set this to the actual polygon mainnet production.
+import { use } from "@maticnetwork/maticjs";
+import { Web3ClientPlugin } from '@maticnetwork/maticjs-web3';
+use(Web3ClientPlugin);
+
 
 
 // Store for state. Used for authentication.

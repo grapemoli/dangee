@@ -2,7 +2,11 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { ref, onBeforeMount } from 'vue';
-import { useStore } from 'vuex'
+import { useStore } from 'vuex';
+import { use } from "@maticnetwork/maticjs";
+import { Web3ClientPlugin } from '@maticnetwork/maticjs-web3';
+
+use(Web3ClientPlugin);
 
 const store = useStore();
 const router = useRouter();
@@ -13,45 +17,87 @@ window.userWalletAddress = null;
 
 onBeforeMount(() => {
   // Check that the wallet is installed in the web browser.
-  if (window.ethereum) {
-
-    // Create Web3 instance.
-    const web3 = new Web3 (window.ethereum);
+  if (window.ethereum && window.ethereum.isMetaMask) {
     errorMsg.value = "";
     isDisabled.value = false;
   } else {
 
     // If not installed, prompt the user to install metamask.
-    errorMsg.value = "Please install MetaMask or any Polygon Extension Wallet to get started.";
+    errorMsg.value = "Please install MetaMask to get started.";
     isDisabled.value = true;
   }
 });
 
 
 // Event handler for logging in with wallet.
-// 1. Web3 login function
 const loginWithEth = async () => {
-  if (web3) {
+  if (window.ethereum) {
+    const web3 = new Web3(window.ethereum);
+
     try {
-      // Get the user's [ethereum] account - prompts MetaMask to login.
+      // Get the user's account - prompts MetaMask to login.
       const selectedAccount = await window.ethereum
           .request({
             method: "eth_requestAccounts",
           })
-          .then((accounts) => accounts[0])    // Only use the first account.
+          .then((accounts) => accounts[0])        // Only use the first account if the user has multiple registered.
           .catch(() => {
             // Throws this error if the user cancels the login prompt.
             throw Error("Please select an account");
           });
 
-      // This code facilitates the user changing their account (if they have multiple).
-      // Update the store.
-      window.ethereum.on('accountsChanged', function (selectedAccount) {
-        store.dispatch('login', selectedAccount[0]);
-      });
+      // Final check for login: check if the user has the Polygon Mumbai Testnet on their MetaMask account.
+      // Else, add it for the user (or, simply switch to it). Note that everything is in the store
+      // for easy configuration.
+      var onChain = false;
+      const chainId = store.getters['chainId'];
+
+      if (window.ethereum.networkVersion !== chainId) {
+        // Try to switch the user to the chain.
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: web3.utils.toHex(chainId) }]
+          });
+
+          onChain = true;
+        }
+        catch (err) {
+          // Error 4902 is thrown if the user does not have the chain on their MetaMask account.
+          // In which case, we add the chain for them.
+          if (err.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainName: store.getters['chainName'],
+                  chainId: web3.utils.toHex(chainId),
+                  nativeCurrency: { name: store.getters['tokenName'], decimals: store.getters['tokenDecimals'], symbol: store.getters['tokenSymbol'] },
+                  rpcUrls: [store.getters['rpc']]
+                }
+              ]
+            }).then(() => onChain = true ).catch((err) => {
+              errorMsg.value = `Add the ${store.getters['chainName']} chain on MetaMask to continue.`;
+            })
+          }
+          // General catch-all, ask the user to switch to MATIC; else, disallow login.
+          else {
+            errorMsg.value = `Add and switch to ${store.getters['chainName']} chain on MetaMask to continue.`;
+          }
+        }
+      }
 
       // Otherwise, login the user like normal & set the state (the store takes care of both).
-      store.dispatch('login', selectedAccount);
+      if (onChain) {
+        store.dispatch('login', selectedAccount);
+      }
+
+      // This facilitates the user switching accounts, and updates the store accordingly.
+      if (window.ethereum && window.localStorage.getItem("userWalletAddress")) {
+        window.ethereum.on('accountsChanged', function (selectedAccount) {
+          store.dispatch('login', selectedAccount[0]);
+        });
+      }
 
       // Bring user back to the main page.
       router.push({path: '/'});
@@ -79,22 +125,6 @@ const loginWithEth = async () => {
   <section class="information-section">
     <Image class='animated-logo' src="/animated_logo.gif" alt="Animation of the Logo" width="250" />
   </section>
-
-  <!-- DASHBOARD SECTION -->
-  <!--
-  <section class="dashboard-section">
-    <h2 class="wallet-status">Wallet Connected! 🤝</h2>
-    <h3 class="wallet-address-heading">
-      ETH Wallet Address:
-      <span class="wallet-address"></span>
-    </h3>
-    <h3 class="wallet-balance-heading">
-      ETH Balance:
-      <span class="wallet-balance"></span>
-    </h3>
-    <button class="logout-btn">🔐 Log out</button>
-  </section>
-  -->
 </template>
 
 

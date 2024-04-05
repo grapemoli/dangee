@@ -5,6 +5,11 @@ An SPA created by Vue3, this website enables:
 - trading/selling NFTs, and
 - minting NFTs.
 
+
+## Requirements
+To use this service, please setup the Mumbai Testnet on your MetaMask account. An example:
+![Screenshot 2024-04-04 at 5.49.46 PM.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F23%2Fjc9pcnfd10q2q27zck3k27vh0000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_pY0MU2%2FScreenshot%202024-04-04%20at%205.49.46%E2%80%AFPM.png)
+
 ## Web3 Authentication
 We currently only support the MetaMask wallet, as Web3 authentication was done via the [MetaMask API](https://docs.metamask.io/).
 
