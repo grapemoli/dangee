@@ -33,7 +33,7 @@ const NFTList = ref([
     URI: 'foo',
     URL: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Google_Images_2015_logo.svg',
     owner: 'foo',
-    selling: true,
+    selling: false,
     tokenId: 50,
     price: 0
   },
