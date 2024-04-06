@@ -7,22 +7,13 @@ const store = useStore();
 
 const walletId = computed(() => store.getters["userId"]);
 const isAuth = computed(() => store.getters["isAuth"]);
-const balance = ref(0);
+const balance = computed(() => store.getters['balance']);
 
-
-if (window.ethereum && isAuth.value) {
-  const web3 = new Web3(window.ethereum);
-  web3.eth.getBalance(store.getters['userId']).then((result) => {
-    balance.value = web3.utils.fromWei(result, "ether");
-  });
-}
 
 watch((walletId) => {
+  // Update the balance if the walletId changes.
   if (window.ethereum && isAuth.value) {
-    const web3 = new Web3(window.ethereum);
-    web3.eth.getBalance(store.getters['userId']).then((result) => {
-      balance.value = web3.utils.fromWei(result, "ether");
-    });
+    store.dispatch('updateBalance');
   }
 })
 </script>
