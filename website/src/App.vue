@@ -15,7 +15,7 @@ if (window.ethereum && window.localStorage.getItem("userWalletAddress")) {
   window.ethereum.on('accountsChanged', function (selectedAccount) {
     store.dispatch('login', selectedAccount[0])
         .then(() => {
-          toast.add({ severity: 'success', summary: 'Switched Accounts', detail: 'Successfully to a registered accounts.', life: 3000 });
+          toast.add({ severity: 'success', summary: 'Switched Accounts', detail: 'Successfully switched to a registered account.', life: 3000 });
         }).catch(() => {
           toast.add({ severity: 'error', summary: 'Error', detail: 'Could not switch accounts. Login again.', life: 3000 });
           store.dispatch('logout');

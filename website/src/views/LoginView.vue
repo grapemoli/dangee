@@ -3,15 +3,12 @@
 import { useRouter } from 'vue-router';
 import { ref, onBeforeMount } from 'vue';
 import { useStore } from 'vuex';
-import { use } from "@maticnetwork/maticjs";
-import { Web3ClientPlugin } from '@maticnetwork/maticjs-web3';
-
-use(Web3ClientPlugin);
 
 const store = useStore();
 const router = useRouter();
 const errorMsg = ref('');
 const isDisabled = ref(false);
+const contract = store.getters["contract"];
 
 window.userWalletAddress = null;
 
@@ -40,9 +37,10 @@ const loginWithEth = async () => {
           .request({
             method: "eth_requestAccounts",
           })
-          .then((accounts) => accounts[0])        // Only use the first account if the user has multiple registered.
-          .catch(() => {
+          .then(async (accounts) => accounts[0])
+          .catch((err) => {
             // Throws this error if the user cancels the login prompt.
+            alert(err)
             throw Error("Please select an account");
           });
 

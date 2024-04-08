@@ -6,7 +6,6 @@ import { useToast } from "primevue/usetoast";
 import { useStore } from 'vuex';
 import { ref } from 'vue';
 
-
 const store = useStore();
 const confirm = useConfirm();
 const toast = useToast();
@@ -24,6 +23,7 @@ const cancel = () => {
 const logout = () => {
   // First, confirm that the user wants to logout.
   confirm.require({
+    group: 'headless',
     message: 'Do you want to logout?',
     header: 'Confirmation',
     icon: 'pi pi-info-circle',
@@ -65,7 +65,23 @@ const logout = () => {
 <template>
   <!-- Logout Dialog if the logout button is clicked. -->
   <Toast />
-  <ConfirmDialog></ConfirmDialog>
+
+  <ConfirmDialog group="headless">
+    <template #container="{ message, acceptCallback, rejectCallback }">
+      <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+        <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8">
+          <i class="pi pi-question text-5xl"></i>
+        </div>
+        <span class="font-bold text-2xl block mb-2 mt-4">{{ message.header }}</span>
+        <p class="mb-0">{{ message.message }}</p>
+        <div class="flex align-items-center gap-2 mt-4">
+          <Button label="Logout" @click="acceptCallback"></Button>
+          <Button label="Cancel" outlined @click="rejectCallback"></Button>
+        </div>
+      </div>
+    </template>
+  </ConfirmDialog>
+
 
   <div class="card flex flex-wrap gap-2 justify-content-center">
     <Button @click="logout" label="Logout" severity="danger" outlined :disabled="disabled"></Button>

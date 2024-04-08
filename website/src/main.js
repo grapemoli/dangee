@@ -9,13 +9,6 @@ const app = createApp(App);
 app.use(router);
 
 
-// Web3 Authentication. For now, we set the chain to the Mumbai testnet; however,
-// be sure to set this to the actual polygon mainnet production.
-import { use } from "@maticnetwork/maticjs";
-import { Web3ClientPlugin } from '@maticnetwork/maticjs-web3';
-use(Web3ClientPlugin);
-
-
 // Store for state. Used for authentication.
 import store from './store';
 app.use(store);
@@ -28,13 +21,17 @@ window.userWalletAddress = window.localStorage.getItem("userWalletAddress");
 
 
 // Initialize the smart contract in the store. Set its state as needed.
-const web3 = new Web3(store.state.rpc);
+// Note that the Web3 provider here the window.ethereum injection from MetaMask if the user has
+// MetaMask installed. Elsewise, we make the provider the rpc.
+const web3socket = new Web3(new Web3.providers.WebsocketProvider('wss://polygon-mumbai-bor-rpc.publicnode.com'));
+const web3 = new Web3((window.ethereum && window.ethereum.isMetaMask) ? window.ethereum : store.state.rpc)
 store.state.contract = new web3.eth.Contract(JSON.parse(store.state.abi), store.state.contractId);
-store.state.contract.events.allEvents();
+store.state.websocket = new web3socket.eth.Contract(JSON.parse(store.state.abi), store.state.contractId);
 
-// Set the balance if the user exists.
+// Set the information if the user exists.
 store.dispatch('updateBalance');
-
+store.dispatch('updateMinter');
+store.dispatch('updateGasFee');
 
 // PrimeVue Assets for the application.
 import 'primeicons/primeicons.css';
@@ -46,15 +43,18 @@ import DataView from 'primevue/dataview';
 import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions';
 import Divider from 'primevue/divider';
 import Dropdown from 'primevue/dropdown';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 import Image from 'primevue/image';
 import Menubar from 'primevue/menubar';
-import Message from 'primevue/message';
 import Paginator from 'primevue/paginator';
 import ProgressSpinner from 'primevue/progressspinner';
 import TabMenu from "primevue/tabmenu";
 import Tag from 'primevue/tag';
 import ToggleButton from 'primevue/togglebutton';
 import Skeleton from 'primevue/skeleton';
+import SpeedDial from 'primevue/speeddial';
+import Steps from 'primevue/steps';
 
 import ConfirmDialog from 'primevue/confirmdialog';
 import ConfirmationService from 'primevue/confirmationservice';
@@ -73,11 +73,14 @@ app.component('DataView', DataView);
 app.component('DataViewLayoutOptions', DataViewLayoutOptions);
 app.component('Divider', Divider);
 app.component('Dropdown', Dropdown);
+app.component('IconField', IconField);
+app.component('InputIcon', InputIcon);
 app.component('Image', Image);
 app.component('Menubar', Menubar);
-app.component('Message', Message);
 app.component('Paginator', Paginator);
 app.component('ProgressSpinner', ProgressSpinner);
+app.component('SpeedDial', SpeedDial);
+app.component('Steps', Steps);
 app.component('Tag', Tag);
 app.component('ToggleButton', ToggleButton);
 
