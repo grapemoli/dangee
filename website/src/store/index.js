@@ -28,7 +28,7 @@ export default createStore({
         userId: window.localStorage.getItem("userWalletAddress"),
 
         // User information.
-        balance: 0,
+        balance: 0,                     // Balance in GWei / MATIC.
         minter: false,
     },
     // Mutations commit the data.

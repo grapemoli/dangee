@@ -40,22 +40,6 @@ const sortOptions = ref([
 ]);
 
 const NFTList = ref([
-    {
-      URI: 'foo',
-      URL: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Google_Images_2015_logo.svg',
-      owner: 'foo',
-      selling: true,
-      tokenId: 100,
-      price: 100
-    },
-  {
-    URI: 'foo',
-    URL: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Google_Images_2015_logo.svg',
-    owner: 'foo',
-    selling: false,
-    tokenId: 50,
-    price: 0
-  },
 ]);
 
 const tabMenuItems = ref([
@@ -101,7 +85,6 @@ onBeforeMount(() => {
 
 
       NFTList.value.push(newNFT);
-
     }
 
     // If all the NFTs are loaded, then the skeleton can be removed.
@@ -136,17 +119,13 @@ const floatingItems = ref([
 // This event handler only updates the NFTList information, pertaining to this route.
 const websocket = store.getters['websocket'];
 
-websocket.events.allEvents({}, async (error, event) => {
+websocket.events.NewItem()
+    .on("connected", function(subscriptionId){ console.log(`NewItem SubscriptionID=${subscriptionId}`); })
+    .on("data", function(event) {
 
-  if (event) {
-
-    switch (event.event) {
-      case 'NewItem': {
-
-        // Append item to the NFTList.
-        const tokenId = event.returnValues.tokenId;
-        const IPFSHash = await contract.methods.getURI(tokenId).call();
-
+      // Append item to the NFTList.
+      const tokenId = event.returnValues.tokenId;
+      contract.methods.getURI(tokenId).call().then(async (IPFSHash) => {
         var newNFT = {
           URI: IPFSHash,
           URL: `${import.meta.env.VITE_GATEWAY_PRE}${IPFSHash}${import.meta.env.VITE_GATEWAY_POST}`,
@@ -155,46 +134,38 @@ websocket.events.allEvents({}, async (error, event) => {
           tokenId: i,
           price: event.returnValues.price                   // Price in Wei.
         };
-
         NFTList.value.push(newNFT);
+      })
+});
 
-        break;
-      }
+websocket.events.PriceUpdate()
+    .on("connected", function(subscriptionId){ console.log(`PriceUpdate SubscriptionID=${subscriptionId}`);})
+    .on("data", function(event) {
 
-      case 'PriceUpdate': {
+      // Update item in the NFTList.
+      const tokenId = event.returnValues.tokenId;
+      NFTList.value[tokenId].price = event.returnValues.newPrice;
+     });
 
-        // Update item in the NFTList.
-        const tokenId = event.returnValues.tokenId;
-        NFTList.value[tokenId].price = event.returnValues.newPrice;
+websocket.events.ItemForSale()
+    .on("connected", function(subscriptionId){ console.log(`ItemForSale SubscriptionID=${subscriptionId}`);})
+    .on("data", function(event) {
 
-        break;
-      }
-      case 'ItemForSale': {
+      // Update selling status in the NFTList.
+      const tokenId = event.returnValues.tokenId;
+      NFTList.value[tokenId].selling = true;
+      NFTList.value[tokenId].price = event.returnValues.price;
+    });
 
-        // Update selling status in the NFTList.
-        const tokenId = event.returnValues.tokenId;
-        NFTList.value[tokenId].selling = true;
-        NFTList.value[tokenId].price = event.returnValues.price;
+websocket.events.ItemSold()
+    .on("connected", function(subscriptionId){ console.log(`ItemSold SubscriptionID=${subscriptionId}`);})
+    .on("data", function(event) {
 
-        break;
-      }
-      case 'ItemSold': {
+      // Update the owner in the NFTList.
+      const tokenId = event.returnValues.tokenId;
+      NFTList.value[tokenId].owner = event.returnValues.buyer.toLowerCase();
 
-        // Update the owner in the NFTList.
-        const tokenId = event.returnValues.tokenId;
-        NFTList.value[tokenId].owner = event.returnValues.buyer;
-        NFTList.value[tokenId].price = event.returnValues.price;
-
-        break;
-      }
-      default: {
-
-        console.log(event.event)
-        break;
-      }
-    }
-  }
-})
+    });
 
 
 // Gets how we should display the tag for each NFT.
@@ -289,8 +260,6 @@ function buyNFT(NFT) {
             else {
 
               // Call the contract method.
-              NFTList.value[NFT.tokenId].selling = false;       // Disable selling button.
-
               contract.methods.buy(NFT.tokenId).send({from: store.getters['userId'], value: transactionValue.toString()})
                   .catch((err) => {
 
@@ -452,13 +421,13 @@ function reload() {
                   </div>
                   <div class="surface-100 p-1" style="border-radius: 30px">
                     <div class="surface-0 flex align-items-center gap-2 justify-content-center py-1 px-2" style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)">
-                      <span class="font-overflow text-900 font-medium text-sm">{{ item.owner }}</span>
+                      <span class="font-overflow text-900 font-medium text-sm" v-text="item.owner"></span>
                       <i class="pi pi-user text-purple-500"></i>
                     </div>
                   </div>
                 </div>
                 <div class="flex flex-column md:align-items-end gap-5">
-                  <span class="text-xl font-semibold text-900">{{ item.price * 0.000000000000000001 }} MATIC</span>
+                  <span class="text-xl font-semibold text-900" v-text="`${item.price * 0.000000000000000001} MATIC`"></span>
                   <div class="flex flex-row-reverse md:flex-row gap-2">
                     <Button icon="pi pi-shopping-cart" label="Buy Now" @click="buyNFT(item)" :disabled="!item.selling ? true : (item.owner === store.getters['userId'])" class="flex-auto md:flex-initial white-space-nowrap"></Button>
                   </div>
@@ -487,13 +456,13 @@ function reload() {
                   </div>
                   <div class="surface-100 p-1 font-overflow" style="border-radius: 30px">
                     <div class="surface-0 flex align-items-center gap-2 justify-content-center py-1 px-2" style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)">
-                      <span class="font-overflow text-900 font-medium text-sm">{{ item.owner }}</span>
+                      <span class="font-overflow text-900 font-medium text-sm" v-text="item.owner"></span>
                       <i class="pi pi-user text-purple-500"></i>
                     </div>
                   </div>
                 </div>
                 <div class="flex flex-column gap-4 mt-4">
-                  <span class="font-overflow text-2xl font-semibold text-900">{{ item.price * 0.000000000000000001 }} MATIC</span>
+                  <span class="font-overflow text-2xl font-semibold text-900" v-text="`${item.price * 0.000000000000000001} MATIC`"></span>
                   <div class="flex gap-2">
                     <Button icon="pi pi-shopping-cart" label="Buy Now" @click="buyNFT(item)" :disabled="!item.selling ? true : (item.owner === store.getters['userId'])" class="flex-auto md:flex-initial white-space-nowrap"></Button>
                   </div>

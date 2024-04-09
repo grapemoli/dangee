@@ -164,7 +164,7 @@ websocket.events.allEvents({}, (error, event) => {
     }
   }
 })
-    .on('connected', (subscriptionId) => console.log(`SubscriptionID ${subscriptionId}`))
+    .on('connected', (subscriptionId) => console.log(`Banner SubscriptionID ${subscriptionId}`))
     .on('error', (error) => {
 
       // The network rejected the transaction somehow. This is a rare occurrence,
