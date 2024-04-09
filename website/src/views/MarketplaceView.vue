@@ -4,8 +4,10 @@ import {onBeforeMount, ref} from "vue";
 import { useStore } from 'vuex';
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
+import {useRouter} from "vue-router";
 
 const store = useStore();
+const router = useRouter();
 const layout = ref('grid');
 const contract = store.getters['contract'];
 const toast = useToast();
@@ -14,6 +16,7 @@ const confirm = useConfirm();
 // For skeleton
 const skeletonStyle = ref('');
 const dataStyle = ref('display:none;');
+const skeletonList = ref({name: 'foo'});
 
 // For step
 const activeStep = ref(0);
@@ -61,7 +64,7 @@ const tabMenuItems = ref([
   {
   label: 'Mint',
     icon: 'pi pi-images',
-    route: '/marketplace',
+    route: '/mint',
   }
 ]);
 
@@ -99,7 +102,7 @@ const floatingItems = ref([
       label: 'Mint ITM',
       icon: 'pi pi-pencil',
       command: () => {
-        alert('Minting an NFT... (TBD)')
+        router.push({path: '/mint'});
       }},
     {
       label: 'Refresh Page',
@@ -379,7 +382,7 @@ function reload() {
   <h1 class="title">Marketplace</h1>
 
   <!-- DataView -->
-  <div class="card" :style="dataStyle">
+  <div class="card" :style="dataStyle" v-cloak>
     <DataView :value="NFTList" :layout="layout" :sortOrder="sortOrder" :sortField="sortField" paginator :rows="20">
       <template #header>
         <table style="width:100%;">
@@ -481,7 +484,7 @@ function reload() {
 
 
   <!-- Skeleton: for loading. -->
-  <DataView class="card" :value="NFTList" :layout="layout" paginator :rows="20" :style="skeletonStyle">
+  <DataView class="card" :value="skeletonList" :layout="layout" paginator :rows="20" :style="skeletonStyle">
     <template #header>
       <table style="width:100%;">
         <colgroup>
@@ -566,6 +569,10 @@ function reload() {
 
 <!-- CSS -->
 <style>
+[v-cloak] {
+  display:none;
+}
+
 .card {
   margin-top: 0px;
 }

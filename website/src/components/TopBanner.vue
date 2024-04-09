@@ -42,13 +42,13 @@ const menuItems = ref([
   },
   {
     label: 'Market',
-    icon: 'pi pi-bitcoin',
+    icon: 'pi pi-shopping-cart',
     route: '/marketplace'
   },
   {
     label: 'Library',
     icon: 'pi pi-shop',
-    route: '/login'
+    route: '/library'
   },
   {
     label: 'Account',

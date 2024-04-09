@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
+import LibraryView from '../views/LibraryView.vue';
 import LoginView from '../views/LoginView.vue';
 import LogoutView from '../views/LogoutView.vue';
 import DashboardView from '../views/DashboardView.vue';
 import MarketplaceView from '../views/MarketplaceView.vue';
+import MintView from '../views/MintView.vue';
 import store from '../store/index.js'
 
 const router = createRouter({
@@ -62,33 +64,17 @@ const router = createRouter({
       path: '/marketplace',
       name: 'marketplace',
       component: MarketplaceView
-    }
-      /*
-      children: [
-        {
-          path: '/sell',
-          name: 'sell',
-          component: SellView
-        },
-        {
-          path: '/buy',
-          name: 'buy',
-          component: BuyView
-        },
-        {
-          path: '/mint',
-          name: 'mint',
-          component: MintView
-        }
-      ]
     },
-      /*
     {
       path: '/library',
       name: 'library',
       component: LibraryView
+    },
+    {
+      path: '/mint',
+      name: 'mint',
+      component: MintView
     }
-    */
   ]
 });
 
