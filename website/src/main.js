@@ -52,6 +52,7 @@ import ProgressSpinner from 'primevue/progressspinner';
 import TabMenu from "primevue/tabmenu";
 import Tag from 'primevue/tag';
 import ToggleButton from 'primevue/togglebutton';
+import Tooltip from 'primevue/tooltip';
 import Skeleton from 'primevue/skeleton';
 import SpeedDial from 'primevue/speeddial';
 import Steps from 'primevue/steps';
@@ -79,6 +80,7 @@ app.component('Image', Image);
 app.component('Menubar', Menubar);
 app.component('Paginator', Paginator);
 app.component('ProgressSpinner', ProgressSpinner);
+app.component('Skeleton', Skeleton);
 app.component('SpeedDial', SpeedDial);
 app.component('Steps', Steps);
 app.component('Tag', Tag);
@@ -88,9 +90,9 @@ app.component('ConfirmDialog', ConfirmDialog);
 app.use(ConfirmationService);
 app.component('Toast', Toast);
 app.use(ToastService);
+app.directive('tooltip', Tooltip);
 
 app.component('TabMenu', TabMenu);
-app.component('Skeleton', Skeleton);
 
 
 // Mount the application at the end.

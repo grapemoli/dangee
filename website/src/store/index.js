@@ -29,7 +29,7 @@ export default createStore({
 
         // User information.
         balance: 0,                     // Balance in GWei / MATIC.
-        minter: false,
+        minter: null,
     },
     // Mutations commit the data.
     mutations: {
@@ -108,7 +108,7 @@ export default createStore({
                     commit('update_minter', true);
                 }
                 else {
-                    state.contract.methods.canMint().call().then((res) => commit('update_minter', res));
+                    state.contract.methods.canMint().call({from: state.userId}).then(async (res) => commit('update_minter', res));
                 }
             }
             else {
