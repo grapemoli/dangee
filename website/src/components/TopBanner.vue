@@ -1,6 +1,7 @@
 <!-- TopBanner.vue
   -- This component refers to the shared top-banner that facilitates
   -- movement across different pages. It is used in all pages of this application.
+  -- Functionality: Top-Menu, Common Alerts/Notifications/Toasts.
   -->
 
 <!-- JavaScript -->
@@ -9,8 +10,10 @@ import { RouterLink, RouterView } from 'vue-router';
 import { ref, onMounted, watch, computed } from 'vue';
 import { usePrimeVue } from 'primevue/config';
 import { useStore } from 'vuex';
-import {useToast} from "primevue/usetoast";
+import { useToast } from "primevue/usetoast";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const toast = useToast();
 const store = useStore();
 const PrimeVue = usePrimeVue();
@@ -121,7 +124,8 @@ websocket.events.allEvents({}, (error, event) => {
 
         // Inform the user, if they are the owner, that their NFT is on the marketplace.
         if (event.returnValues.sender.toLowerCase() === store.getters['userId']) {
-          toast.add({ severity: 'info', summary: `Successfully minted ITM#${event.returnValues.tokenId}!`, detail: `Your minted ITM is now on the marketplace!`, life: 5000 });
+          toast.add({ severity: 'success', summary: `Minted ITM#${event.returnValues.tokenId}!`, detail: `Your minted ITM is now on the marketplace!`, life: 5000 });
+          router.push({path: '/library'});
         }
 
         break;
@@ -149,10 +153,10 @@ websocket.events.allEvents({}, (error, event) => {
 
         // If the user is the seller or buyer, tell them about this successful transaction.
         if (event.returnValues.seller.toLowerCase() === store.getters['userId']) {
-          toast.add({ severity: 'info', summary: `Successfully Bought ITM#${event.returnValues.tokenId}!`, detail: `This ITM is now yours! You can view it in your library, or on the market.`, life: 5000 });
+          toast.add({ severity: 'info', summary: `Successfully Sold ITM#${event.returnValues.tokenId}!`, detail: `User ${event.returnValues.seller} successfully bought ITM${event.returnValues.tokenId}!`, life: 5000 });
         }
         else if (event.returnValues.buyer.toLowerCase() === store.getters['userId']) {
-          toast.add({ severity: 'info', summary: `Successfully Sold ITM#${event.returnValues.tokenId}!`, detail: `User ${event.returnValues.seller} successfully bought this ITM listing!`, life: 5000 });
+          toast.add({ severity: 'info', summary: `Successfully Bought ITM#${event.returnValues.tokenId}!`, detail: `This ITM is now yours! You can view it in your library, or on the market.`, life: 5000 });
         }
 
         break;

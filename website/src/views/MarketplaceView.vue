@@ -5,6 +5,7 @@ import { useStore } from 'vuex';
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
 import {useRouter} from "vue-router";
+import FloatingButtonMenu from '../components/FloatingButtonMenu.vue';
 
 const store = useStore();
 const router = useRouter();
@@ -96,23 +97,6 @@ onBeforeMount(() => {
   })
 });
 
-// For floating menu button.
-const floatingItems = ref([
-    {
-      label: 'Mint ITM',
-      icon: 'pi pi-pencil',
-      command: () => {
-        router.push({path: '/mint'});
-      }},
-    {
-      label: 'Refresh Page',
-      icon: 'pi pi-refresh',
-      command: () => {
-        window.location.reload();
-      }
-    }
-]);
-
 // Set up event listener for the smart contract. The events we listen to are:
 // (1) NewItem @returnValues=(address sender, uint256 tokenId, uint256 price);
 // (2) PriceUpdate @returnValues=(address owner, uint256 indexed tokenId, uint256 oldPrice, uint256 newPrice);
@@ -122,54 +106,109 @@ const floatingItems = ref([
 // This event handler only updates the NFTList information, pertaining to this route.
 const websocket = store.getters['websocket'];
 
-websocket.events.NewItem()
-    .on("connected", function(subscriptionId){ console.log(`NewItem SubscriptionID=${subscriptionId}`); })
-    .on("data", function(event) {
+onBeforeMount (() => {
+  websocket.events.allEvents()
+      .on('connected', (subId) => {console.log(`Marketplace SubscriptionID #${subId}`)})
+      .on('data', function(event) {
 
-      // Append item to the NFTList.
-      const tokenId = event.returnValues.tokenId;
-      contract.methods.getURI(tokenId).call().then(async (IPFSHash) => {
-        var newNFT = {
-          URI: IPFSHash,
-          URL: `${import.meta.env.VITE_GATEWAY_PRE}${IPFSHash}${import.meta.env.VITE_GATEWAY_POST}`,
-          owner: event.returnValues.sender,
-          selling: await contract.methods.isSelling(tokenId).call(),
-          tokenId: i,
-          price: event.returnValues.price                   // Price in Wei.
-        };
-        NFTList.value.push(newNFT);
-      })
-});
+        // (1) NewItem event.
+        if(event.event === 'NewItem') {
 
-websocket.events.PriceUpdate()
-    .on("connected", function(subscriptionId){ console.log(`PriceUpdate SubscriptionID=${subscriptionId}`);})
-    .on("data", function(event) {
+          // Append item to the NFTList.
+          const tokenId = event.returnValues.tokenId;
+          contract.methods.getURI(tokenId).call().then(async (IPFSHash) => {
+            const newNFT = {
+              URI: IPFSHash,
+              URL: `${import.meta.env.VITE_GATEWAY_PRE}${IPFSHash}${import.meta.env.VITE_GATEWAY_POST}`,
+              owner: event.returnValues.sender,
+              selling: await contract.methods.isSelling(tokenId).call(),
+              tokenId: i,
+              price: event.returnValues.price                   // Price in Wei.
+            };
 
-      // Update item in the NFTList.
-      const tokenId = event.returnValues.tokenId;
-      NFTList.value[tokenId].price = event.returnValues.newPrice;
-     });
+            NFTList.value.push(newNFT);
+          })
+        }
 
-websocket.events.ItemForSale()
-    .on("connected", function(subscriptionId){ console.log(`ItemForSale SubscriptionID=${subscriptionId}`);})
-    .on("data", function(event) {
+        // (2) PriceUpdate
+        else if (event.event === 'PriceUpdate') {
 
-      // Update selling status in the NFTList.
-      const tokenId = event.returnValues.tokenId;
-      NFTList.value[tokenId].selling = true;
-      NFTList.value[tokenId].price = event.returnValues.price;
-    });
+          // Update item in the NFTList.
+          const tokenId = event.returnValues.tokenId;
+          NFTList.value[tokenId].price = event.returnValues.newPrice;
 
-websocket.events.ItemSold()
-    .on("connected", function(subscriptionId){ console.log(`ItemSold SubscriptionID=${subscriptionId}`);})
-    .on("data", function(event) {
+        }
 
-      // Update the owner in the NFTList.
-      const tokenId = event.returnValues.tokenId;
-      NFTList.value[tokenId].owner = event.returnValues.buyer.toLowerCase();
+        // (3) ItemForSale
+        else if (event.event === 'ItemForSale') {
 
-    });
+          // Update selling status in the NFTList.
+          const tokenId = event.returnValues.tokenId;
+          NFTList.value[tokenId].selling = true;
+          NFTList.value[tokenId].price = event.returnValues.price;
+        }
 
+        // (4) ItemSold
+        else if (event.event === 'ItemSold') {
+
+          // Update the owner in the NFTList.
+          const tokenId = event.returnValues.tokenId;
+          NFTList.value[tokenId].owner = event.returnValues.buyer.toLowerCase();
+        }
+  })
+
+
+  // The below is equivalent to the above, with the exception that the above listens to all
+  // events. The below, commented code only listens to the events specified.
+  /*
+  websocket.events.NewItem()
+      .on("connected", function(subscriptionId){ console.log(`NewItem SubscriptionID=${subscriptionId}`); })
+      .on("data", function(event) {
+
+        // Append item to the NFTList.
+        const tokenId = event.returnValues.tokenId;
+        contract.methods.getURI(tokenId).call().then(async (IPFSHash) => {
+          var newNFT = {
+            URI: IPFSHash,
+            URL: `${import.meta.env.VITE_GATEWAY_PRE}${IPFSHash}${import.meta.env.VITE_GATEWAY_POST}`,
+            owner: event.returnValues.sender,
+            selling: await contract.methods.isSelling(tokenId).call(),
+            tokenId: i,
+            price: event.returnValues.price                   // Price in Wei.
+          };
+          NFTList.value.push(newNFT);
+        })
+      });
+
+  websocket.events.PriceUpdate()
+      .on("connected", function(subscriptionId){ console.log(`PriceUpdate SubscriptionID=${subscriptionId}`);})
+      .on("data", function(event) {
+
+        // Update item in the NFTList.
+        const tokenId = event.returnValues.tokenId;
+        NFTList.value[tokenId].price = event.returnValues.newPrice;
+      });
+
+  websocket.events.ItemForSale()
+      .on("connected", function(subscriptionId){ console.log(`ItemForSale SubscriptionID=${subscriptionId}`);})
+      .on("data", function(event) {
+
+        // Update selling status in the NFTList.
+        const tokenId = event.returnValues.tokenId;
+        NFTList.value[tokenId].selling = true;
+        NFTList.value[tokenId].price = event.returnValues.price;
+      });
+
+  websocket.events.ItemSold()
+      .on("connected", function(subscriptionId){ console.log(`ItemSold SubscriptionID=${subscriptionId}`);})
+      .on("data", function(event) {
+
+        // Update the owner in the NFTList.
+        const tokenId = event.returnValues.tokenId;
+        NFTList.value[tokenId].owner = event.returnValues.buyer.toLowerCase();
+      });
+   */
+})
 
 // Gets how we should display the tag for each NFT.
 const getSeverity = (NFT) => {
@@ -255,6 +294,8 @@ function buyNFT(NFT) {
             // Total cost = (NFTCostWei) + (GasCostWei) = (NFTCostWei) + (Gas + GasPriceGWei * Wei/GWei)
             const transactionValue = (NFT.price) + (gas * store.getters['gasFee'].FastGasPrice * 1000000000);
 
+
+            // Price in GWei/MATIC, vs. the price of the user's balance in GWei/MATIC.
             if ((NFT.price * 0.000000000000000001) > store.getters['balance']) {
               // While the gas fees are estimated, the cost of the NFT is a lower threshold;
               // the user 100% does not have enough MATIC to fund this transaction.
@@ -333,6 +374,7 @@ function reload() {
 <template>
   <!-- Error Messages for Buying, and Buying Dialog. -->
   <Toast></Toast>
+  <FloatingButtonMenu></FloatingButtonMenu>
 
   <ConfirmDialog group="headless" style="width: 75%; height: 100%;">
     <template #container="{ message, acceptCallback, rejectCallback }">
@@ -402,10 +444,6 @@ function reload() {
             </tr>
           </tbody>
         </table>
-
-        <!-- Floating button menu -->
-        <SpeedDial :model="floatingItems" class="right-0 bottom-0" :tooltipOptions="{ position: 'left' }" style="position:fixed; margin:2%;" />
-
       </template>
 
       <!-- Actual DataView: List View -->
@@ -474,9 +512,6 @@ function reload() {
             </div>
           </div>
         </div>
-
-        <!-- Floating button menu -->
-        <SpeedDial :model="floatingItems" class="right-0 bottom-0" :tooltipOptions="{ position: 'left' }" style="position:fixed; margin:2%;" />
       </template>
     </DataView>
   </div>

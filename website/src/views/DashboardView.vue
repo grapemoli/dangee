@@ -14,7 +14,7 @@ const walletId = computed(() => store.getters["userId"]);
 const isAuth = computed(() => store.getters["isAuth"]);
 const balance = computed(() => store.getters['balance']);
 const minter = computed(() => store.getters['minter']);
-const minterButtonStyle = ref(false);
+const minterButtonStyle = computed(() => store.getters['minter'] !== null);
 
 const grantMintRole = () => {
   // First, confirm that the user wants to logout.
@@ -62,12 +62,6 @@ watch(walletId, () => {
   }
 })
 
-watch(minter, (newMinter, oldMinter) => {
-  if (oldMinter === null) {
-    // The updateMinter() method in the store must have finished!
-    minterButtonStyle.value = true;
-  }
-})
 </script>
 
 

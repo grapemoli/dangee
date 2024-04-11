@@ -108,11 +108,13 @@ export default createStore({
                     commit('update_minter', true);
                 }
                 else {
-                    state.contract.methods.canMint().call({from: state.userId}).then(async (res) => commit('update_minter', res));
+                    state.contract.methods.canMint().call({from: state.userId}).then(async (res) => {
+                        commit('update_minter', res)
+                    });
                 }
             }
             else {
-                commit('update_minter', false)
+                commit('update_minter', null)
             }
         },
         updateGasFee(context) {
@@ -172,6 +174,6 @@ export default createStore({
         },
         gasFee: function(state) {
             return state.gasFee;
-        }
+        },
     }
 })
