@@ -5,7 +5,9 @@ import {useStore} from 'vuex';
 import {useToast} from "primevue/usetoast";
 import {useConfirm} from "primevue/useconfirm";
 import {usePrimeVue} from 'primevue/config';
+import {useRouter} from "vue-router";
 
+const router = useRouter();
 const store = useStore();
 const contract = store.getters['contract'];
 const toast = useToast();
@@ -14,6 +16,10 @@ const confirm = useConfirm();
 const minter = computed(() => store.getters['minter']);
 const isAuth = computed(() => store.getters['isAuth']);
 const disabled = ref(true);
+
+// For progress bar.
+const loadingStyle = ref('display: none;');
+const overlayStyle = ref('display: none;');
 
 // For form inputs.
 const price = ref(null);
@@ -97,8 +103,10 @@ async function mint() {
   // Pin the image to IPFS using Piñata API, and get the IPFS hash. Then, mint the NFT.
   // Note: In this approach, the API key is exposed. In development, take measures to hide the
   // API key or keep it safe, e.g., Azure's Key Vaults.
-  toast.add({ severity: "info", summary: "Minting", detail: `Please wait here while your ITM is minting.`, life: 3000 });
+  toast.add({ severity: "info", summary: "Minting", detail: `Please stay on this page while your ITM is minting!`, life: 3000 });
 
+  loadingStyle.value = 'display: block';
+  overlayStyle.value = 'display: block';
 
   var IPFSHash = '';
   try {
@@ -127,6 +135,7 @@ async function mint() {
       },
       body: formData,
     });
+
     const resData = await res.json();
     IPFSHash = resData.IpfsHash;
 
@@ -141,12 +150,16 @@ async function mint() {
 
           // Toast-inform the user that the minting was successful.
           // We don't do it here because the TopBanner already listens for the emitted NewItem event.
+          loadingStyle.value = 'display: none';
+          overlayStyle.value = 'display: none';
         })
         .catch(async (err) => {
 
+          loadingStyle.value = 'display: none';
+          overlayStyle.value = 'display: none';
+
           // Unpin the image
-          const response = await fetch(
-              `https://api.pinata.cloud/pinning/unpin/${IPFSHash}`,
+          const response = await fetch(`https://api.pinata.cloud/pinning/unpin/${IPFSHash}`,
               {
                 method: "DELETE",
                 headers: {
@@ -166,6 +179,9 @@ async function mint() {
   }
   catch (err) {
 
+    loadingStyle.value = 'display: none';
+    overlayStyle.value = 'display: none';
+
     // Unpin the image.
     const response = await fetch(
         `https://api.pinata.cloud/pinning/unpin/${IPFSHash}`,
@@ -177,7 +193,7 @@ async function mint() {
           },
         })
 
-    toast.add({ severity: "error", summary: "Error", detail: `The following is the response to pinning your ITM image to IPFS: ${err}`, life: 3000 });
+    toast.add({ severity: "error", summary: "Error", detail: `${err}`, life: 3000 });
   }
 }
 </script>
@@ -189,7 +205,7 @@ async function mint() {
   <Toast></Toast>
 
   <!-- Only show the minter form if the user has the Minter role. -->
-  <div v-if="!minter" style="padding: 10%;">
+  <div v-if="!minter" style="padding: 10%;" class="form">
 
     <!-- Case 1: User is logged in with no minter status. -->
     <div v-if="isAuth">
@@ -202,18 +218,19 @@ async function mint() {
     </div>
   </div>
 
-  <div v-else>
+
+  <div v-else class="form">
     <!-- Form to mint an NFT. -->
-    <div class="card flex justify-content-center">
+    <div class="card flex justify-content-center" style="padding-top:0; margin-top:0;">
       <Stepper linear v-model:activeStep="active">
 
         <!-- Step #1: Upload Image -->
         <StepperPanel>
           <template #header="{ index, clickCallback }">
             <button class="bg-transparent border-none inline-flex flex-column gap-2" @click="clickCallback">
-                        <span :class="['border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center', { 'bg-primary border-primary': index <= active, 'surface-border': index > active }]">
-                            <i class="pi pi-image" />
-                        </span>
+                      <span :class="['border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center', { 'bg-primary border-primary': index <= active, 'surface-border': index > active }]">
+                          <i class="pi pi-image" />
+                      </span>
             </button>
           </template>
           <template #content="{ nextCallback }">
@@ -243,7 +260,7 @@ async function mint() {
                     <div v-else>
                       <!-- Call back gets rid of the uploaded file, so this is shows the uploaded file when the user
                       goes backwards in the form. -->
-                        <div class="p-fileupload-file" data-pc-section="file"><img role="presentation" class="p-fileupload-file-thumbnail" alt="09ecda0a-2ef5-4c00-966e-cb35d9a9db1c.jpg" :src="files[0].objectURL" width="50" data-pc-section="thumbnail"><div class="p-fileupload-file-details" data-pc-section="details"><div class="p-fileupload-file-name" data-pc-section="filename">{{files[0].name}}</div><span class="p-fileupload-file-size" data-pc-section="filesize">3.487 MB</span><span class="p-badge p-component p-badge-warning p-fileupload-file-badge" data-pc-name="badge" data-pc-extend="badge" data-pc-section="root">Pending</span></div><div class="p-fileupload-file-actions" data-pc-section="actions"></div></div>
+                      <div class="p-fileupload-file" data-pc-section="file"><img role="presentation" class="p-fileupload-file-thumbnail" alt="09ecda0a-2ef5-4c00-966e-cb35d9a9db1c.jpg" :src="files[0].objectURL" width="50" data-pc-section="thumbnail"><div class="p-fileupload-file-details" data-pc-section="details"><div class="p-fileupload-file-name" data-pc-section="filename">{{files[0].name}}</div><span class="p-fileupload-file-size" data-pc-section="filesize">3.487 MB</span><span class="p-badge p-component p-badge-warning p-fileupload-file-badge" data-pc-name="badge" data-pc-extend="badge" data-pc-section="root">Pending</span></div><div class="p-fileupload-file-actions" data-pc-section="actions"></div></div>
                     </div>
                   </template>
                 </FileUpload>
@@ -261,9 +278,9 @@ async function mint() {
         <StepperPanel>
           <template #header="{ index, clickCallback }">
             <button class="bg-transparent border-none inline-flex flex-column gap-2" @click="clickCallback">
-                        <span :class="['border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center', { 'bg-primary border-primary': index <= active, 'surface-border': index > active }]">
-                            <i class="pi pi-pencil" />
-                        </span>
+                      <span :class="['border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center', { 'bg-primary border-primary': index <= active, 'surface-border': index > active }]">
+                          <i class="pi pi-pencil" />
+                      </span>
             </button>
           </template>
           <template #content="{ prevCallback, nextCallback }">
@@ -291,9 +308,9 @@ async function mint() {
         <StepperPanel>
           <template #header="{ index, clickCallback }">
             <button class="bg-transparent border-none inline-flex flex-column gap-2" @click="clickCallback">
-                        <span :class="['border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center', { 'bg-primary border-primary': index <= active, 'surface-border': index > active }]">
-                            <i class="pi pi-id-card" />
-                        </span>
+                      <span :class="['border-round border-2 w-3rem h-3rem inline-flex align-items-center justify-content-center', { 'bg-primary border-primary': index <= active, 'surface-border': index > active }]">
+                          <i class="pi pi-id-card" />
+                      </span>
             </button>
           </template>
           <template #content="{ prevCallback }">
@@ -330,9 +347,6 @@ async function mint() {
 
                 </tbody>
               </table>
-
-
-
             </div>
 
             <div class="flex pt-4 justify-content-between">
@@ -345,6 +359,14 @@ async function mint() {
     </div>
   </div>
 
+  <!-- Progress Spinner. -->
+  <div class="overlay" :style="overlayStyle"></div>
+
+  <!-- Loading for if the user is minting an NFT -->
+  <div class="card flex justify-content-center">
+    <ProgressSpinner class="progress-spinner" :style="loadingStyle"/>
+  </div>
+
 </template>
 
 
@@ -353,7 +375,8 @@ async function mint() {
 .title {
   text-align: center;
   margin-top: 4%;
-  margin-bottom: 0px;
+  margin-bottom: 0;
+  padding-bottom: 0;
   font-family: "Bebas Neue", sans-serif;
   font-size: 10vh;
   font-weight: 400;
@@ -362,5 +385,30 @@ async function mint() {
 
 .p-stepper {
   flex-basis: 40rem;
+}
+
+.progress-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4000;
+
+  transform: translate(-50%, -50%);
+}
+
+.form {
+  position: relative;
+}
+
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 2;
 }
 </style>
