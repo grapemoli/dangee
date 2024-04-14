@@ -43,7 +43,7 @@ const loginWithEth = async () => {
             throw Error("Please select an account");
           });
 
-      // Final check for login: check if the user has the Polygon Mumbai Testnet on their MetaMask account.
+      // Final check for login: check if the user has the Polygon Mainnet on their MetaMask account.
       // Else, add it for the user (or, simply switch to it). Note that everything is in the store
       // for easy configuration.
       var onChain = false;

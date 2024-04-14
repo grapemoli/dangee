@@ -125,7 +125,16 @@ onBeforeMount (() => {
           NFTList.value[tokenId].price = event.returnValues.price;
         }
 
-        // (4) ItemSold
+        // (4) ItemNotForSale
+        else if (event.event === 'ItemNotForSale') {
+
+          // Update selling status in the NFTList.
+          const tokenId = event.returnValues.tokenId;
+          NFTList.value[tokenId].selling = false;
+          NFTList.value[tokenId].price = event.returnValues.price;
+        }
+
+        // (5) ItemSold
         else if (event.event === 'ItemSold') {
 
           // Update the owner in the NFTList.

@@ -23,7 +23,7 @@ window.userWalletAddress = window.localStorage.getItem("userWalletAddress");
 // Initialize the smart contract in the store. Set its state as needed.
 // Note that the Web3 provider here the window.ethereum injection from MetaMask if the user has
 // MetaMask installed. Elsewise, we make the provider the rpc.
-const web3socket = new Web3(new Web3.providers.WebsocketProvider('wss://polygon-mumbai-bor-rpc.publicnode.com'));
+const web3socket = new Web3(new Web3.providers.WebsocketProvider(`wss://polygon-mainnet.infura.io/ws/v3/${import.meta.env.VITE_INFURA_API_KEY}`));
 const web3 = new Web3((window.ethereum && window.ethereum.isMetaMask) ? window.ethereum : store.state.rpc)
 store.state.contract = new web3.eth.Contract(JSON.parse(store.state.abi), store.state.contractId);
 store.state.websocket = new web3socket.eth.Contract(JSON.parse(store.state.abi), store.state.contractId);

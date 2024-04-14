@@ -74,7 +74,7 @@ const formatSize = (bytes) => {
 };
 
 async function estimateGas() {
-  // We use a 'throwaway' IPFS hash: the first IPFS hash.
+  // We use a 'throwaway' IPFS hash to estimate gas prices.
   const IPFSHash = 'QmSVPkvNkyMVTXAGmjJxSg9mJdsWLXMGWXpSeMGP9r9ejC';
 
   const gas = await contract.methods.safeMintWithPrice(store.getters['userId'], IPFSHash, price.value, true).estimateGas(

@@ -147,8 +147,19 @@ websocket.events.allEvents({}, (error, event) => {
 
         // If the user is the owner, tell them about this, and update the store.
         if (event.returnValues.seller.toLowerCase() === store.getters['userId']) {
-          store.dispatch('updateNFTSell', [event.returnValues.tokenId, event.returnValues.newPrice]);
+          store.dispatch('updateNFTSell', [event.returnValues.tokenId, true]);
           toast.add({ severity: 'info', summary: `ITM#${event.returnValues.tokenId} is on the market!`, detail: `Your ITM can now be bought by other users on dangee.`, life: 5000 });
+        }
+
+        break;
+      }
+
+      case 'ItemNotForSale': {
+
+        // If the user is the owner, tell them about this, and update the store.
+        if (event.returnValues.seller.toLowerCase() === store.getters['userId']) {
+          store.dispatch('updateNFTSell', [event.returnValues.tokenId, false]);
+          toast.add({ severity: 'info', summary: `ITM#${event.returnValues.tokenId} is off the market!`, detail: `Your ITM can no longer be bought by other users on dangee.`, life: 5000 });
         }
 
         break;
