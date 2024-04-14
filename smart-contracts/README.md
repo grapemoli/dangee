@@ -9,7 +9,16 @@ The structure of the dictionary is:
 > Mumbai Address: ```0x005e3E29DCC8a11B28C64f49BbBf338856e2cC4b```
 >
 > View and interact with the smart contract [here](https://mumbai.polygonscan.com/address/0x005e3E29DCC8a11B28C64f49BbBf338856e2cC4b).
+> **Note that Mumbai was deprecated on April 8, 2024.**
+
+> Polygon Address ```https://polygonscan.com/address/0xbe72f442b6d8739e4f1dd4fa78624b4ffdffdfd2```
+>
+> View and interact [here](https://polygonscan.com/address/0xbe72f442b6d8739e4f1dd4fa78624b4ffdffdfd2).
 ## Development
+
+### **Note: Mumbai was deprecated on April 8, 2024.**
+### **This README utilized hardhat-deploy, but hardhat now uses hardhat-ignition.**
+
 Before proceeding, please make a MetaMask account, and add the Polygon mainnet and testnet to your networks. You will also need a PolygonScan account.
 1. Please make sure you're running  **Node v20**
 2. Run ```npm install``` to install all dependencies

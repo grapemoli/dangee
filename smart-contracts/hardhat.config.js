@@ -2,6 +2,7 @@ require ('dotenv').config ();
 require ("@nomicfoundation/hardhat-ethers");
 require ("@nomicfoundation/hardhat-verify");
 require ("@nomicfoundation/hardhat-chai-matchers");
+require("@nomicfoundation/hardhat-ignition-ethers");
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -17,8 +18,8 @@ module.exports = {
     },
     polygon: {
       url: "https://polygon-rpc.com/",
-      accounts: [process.env.PRIVATE_KEY_REAL, process.env.PRIVATE_KEY_REAL_2]
-    },
+      accounts: [process.env.PRIVATE_KEY_REAL]
+    }
   },
   etherscan: {
     apiKey: process.env.POLYGONSCAN_API_KEY

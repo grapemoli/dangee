@@ -34,9 +34,20 @@ Future plans are to deploy dangee onto Microsoft Azure; however, as of yet, dang
 ## Development
 
 ### Front End Development
-Please note that dangee is currently working on the Mumbai testnet, so all transactions and NFT minting are occuring on the testnet.
+Please note that dangee is currently working on the Polygon PoS network, so all transactions and NFT minting occurring use _real money_.
 
 For more information, refer to the [```website``` directory](https://github.com/grapemoli/dangee/tree/main/website).
 
 ### Smart Contract Development
+> Please note that I used two now-deprecated technologies: <br>
+> (1) **Mumbai testnet** - support ended as of April 8, 2024. <br>
+> (2) **hardhat-deploy** - as of the latest hardhat version, hardhat-deploy has been phased out with Ignition 
+> 
+> **Solutions**: <br>
+> (1) To combat the Mumbai support ending, I deployed my smart contract to Polygon's PoS network.
+> 
+> (2) Unfortunately, while Ignition is much simpler than the historic hardhat-deploy, it does has been shown to
+> have issues with Polygon's PoS network... which I'm using. Therefore, I ultimately resulted to testing in hardhat
+> and deploying in RemixIDE. 
+
 For more information, refer to the [```smart-contract``` directory](https://github.com/grapemoli/dangee/tree/main/smart-contracts).

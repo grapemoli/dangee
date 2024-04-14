@@ -10,7 +10,7 @@ require ('dotenv').config ();
 
 async function main () {
   console.log ("Deploying contract...");
-  const item = await hre.ethers.deployContract ("Item", [process.env.WALLET_ADDRESS, process.env.WALLET_ADDRESS], {value: process.env.WALLET_ADDRES});
+  const item = await hre.ethers.deployContract ("Item", [process.env.WALLET_ADDRESS_REAL, process.env.WALLET_ADDRESS_REAL], {value: process.env.WALLET_ADDRESS_REAL});
 
   // Note here that the Item.sol contract requires two parameters: a default admin,
   // and an initial minter. Here, the account specified in the .env is used for both.

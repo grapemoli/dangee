@@ -134,8 +134,6 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
     // NFTs metadata on the blockchain, we store the IPFS hash relating to the NFT.
     function safeMint (address to, string memory uri) public onlyRole (MINTER_ROLE) {
         // Before minting, that we don't already have the max number of NFTs on the platform.
-        // The max is 1001 because we store images on Pinata API, whose free-tier only allows for
-        // up to 1000 pictures.
         require (_nextTokenId < 1000, 'Reached max number of NFTs');
 
         uint256 tokenId = _nextTokenId++;   // Note that the order is (1) tokenId=_nextTokenId, (2) increment
@@ -153,7 +151,7 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
     // caller can also choose whether or not to have the NFT be sellable on the market.
     function safeMintWithPrice (address to, string memory uri, uint256 price, bool onMarket) public onlyRole (MINTER_ROLE) {
         // Before minting, that we don't already have the max number of NFTs on the platform.
-        require (_nextTokenId < 1000, 'Reached max number of NFTs.');
+        require (_nextTokenId <  1000, 'Reached max number of NFTs.');
         require (price > 0, 'Price should be greater than 0.');
 
         uint256 tokenId = _nextTokenId++;   // Note that the order is (1) tokenId=_nextTokenId, (2) increment
