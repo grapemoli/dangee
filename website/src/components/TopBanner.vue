@@ -123,7 +123,9 @@ websocket.events.allEvents({}, (error, event) => {
       case 'NewItem': {
 
         // Inform the user, if they are the owner, that their NFT is on the marketplace.
+        // Also, update the owner's store.
         if (event.returnValues.sender.toLowerCase() === store.getters['userId']) {
+          store.dispatch('addNFT', event.returnValues.tokenId);
           toast.add({ severity: 'success', summary: `Minted ITM#${event.returnValues.tokenId}!`, detail: `Your minted ITM is now on the marketplace!`, life: 5000 });
           router.push({path: '/library'});
         }
@@ -133,8 +135,9 @@ websocket.events.allEvents({}, (error, event) => {
 
       case 'PriceUpdate': {
 
-        // If the user is the owner, tell them about this.
+        // If the user is the owner, tell them about this. Also, update their store.
         if (event.returnValues.owner.toLowerCase() === store.getters['userId']) {
+          store.dispatch('updateNFTPrice', [event.returnValues.tokenId, event.returnValues.newPrice]);
           toast.add({ severity: 'info', summary: `Successfully updated ITM#${event.returnValues.tokenId}!`, detail: `Price updated from ${event.returnValues.oldPrice} MATIC to ${event.returnValues.newPrice} MATIC.`, life: 5000 });
         }
 
@@ -142,8 +145,9 @@ websocket.events.allEvents({}, (error, event) => {
       }
       case 'ItemForSale': {
 
-        // If the user is the owner, tell them about this.
+        // If the user is the owner, tell them about this, and update the store.
         if (event.returnValues.seller.toLowerCase() === store.getters['userId']) {
+          store.dispatch('updateNFTSell', [event.returnValues.tokenId, event.returnValues.newPrice]);
           toast.add({ severity: 'info', summary: `ITM#${event.returnValues.tokenId} is on the market!`, detail: `Your ITM can now be bought by other users on dangee.`, life: 5000 });
         }
 
@@ -152,10 +156,15 @@ websocket.events.allEvents({}, (error, event) => {
       case 'ItemSold': {
 
         // If the user is the seller or buyer, tell them about this successful transaction.
+        // Update both their respective stores.
         if (event.returnValues.seller.toLowerCase() === store.getters['userId']) {
+          // For the seller, we remove the item from the store.
+          store.dispatch('removeNFT', event.returnValues.tokenId);
           toast.add({ severity: 'info', summary: `Successfully Sold ITM#${event.returnValues.tokenId}!`, detail: `User ${event.returnValues.seller} successfully bought ITM${event.returnValues.tokenId}!`, life: 5000 });
         }
         else if (event.returnValues.buyer.toLowerCase() === store.getters['userId']) {
+          // For the buyer, we add the item to the store.
+          store.dispatch('addNFT', event.returnValues.tokenId);
           toast.add({ severity: 'info', summary: `Successfully Bought ITM#${event.returnValues.tokenId}!`, detail: `This ITM is now yours! You can view it in your library, or on the market.`, life: 5000 });
         }
 

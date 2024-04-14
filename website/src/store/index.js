@@ -1,4 +1,4 @@
-import { createStore } from 'vuex';
+import {createStore} from 'vuex';
 
 
 // This store is mainly used for user authentication.
@@ -30,6 +30,7 @@ export default createStore({
         // User information.
         balance: 0,                     // Balance in GWei / MATIC.
         minter: null,
+        nft: [],                        // All NFTs the user owns. Only contains the tokenId.
     },
     // Mutations commit the data.
     mutations: {
@@ -54,6 +55,9 @@ export default createStore({
         },
         update_gas_fee(state, payload) {
             state.gasFee = payload;
+        },
+        update_nft(state, payload) {
+            state.nft = payload;
         }
     },
     // Actions are dispatches that call the mutations.
@@ -65,6 +69,7 @@ export default createStore({
             commit("update_auth", walletId);
             dispatch("updateBalance");
             dispatch('updateMinter');
+            dispatch('updateNFTList');
         },
 
         // Signs out all wallets on the MetaMask extension that are registered onto dangee.
@@ -74,6 +79,7 @@ export default createStore({
             commit("update_auth", null);
             dispatch("updateBalance");
             dispatch('updateMinter');
+            dispatch('updateNFTList');
         },
 
         // Switches the account if the user selects a different account on MetaMask. The MetaMask API
@@ -126,6 +132,127 @@ export default createStore({
                     context.commit('update_gas_fee', gasPrices.result);
                 })
             })
+        },
+        updateNFTList({commit, state}) {
+            // Update the NFT state.
+            if (state.isAuth) {
+
+                // Get the total number of tokens.
+                state.contract.methods.totalItems().call().then(async (totalItems) => {
+
+                    var arrNft = [];
+
+                    // Parse through all items, only pushing the tokenID's whose owner is the user.
+                    for(var i = 0; i < totalItems; i++) {
+
+                        const owner = await state.contract.methods.getSeller(i).call();
+
+                        // The owner owns this NFT!! Get the NFT information.
+                        if(owner.toLowerCase() === state.userId.toLowerCase()) {
+
+                            const IPFSHash = await state.contract.methods.getURI(i).call();
+
+                            var newNFT = {
+                                URI: IPFSHash,
+                                URL: `${import.meta.env.VITE_GATEWAY_PRE}${IPFSHash}${import.meta.env.VITE_GATEWAY_POST}`,
+                                owner: (await state.contract.methods.getSeller(i).call()).toLowerCase(),
+                                selling: await state.contract.methods.isSelling(i).call(),
+                                tokenId: i,
+                                price: Number(await state.contract.methods.getPrice(i).call())        // Price in Wei. Divide by 10^-18 to get MATIC/Gwei.
+                            };
+
+                            arrNft.push(newNFT);
+                        }
+                    }
+
+                    commit('update_nft', arrNft);
+                })
+            }
+            else {
+                // Users who aren't logged in have no NFTs.
+                commit('update_nft', []);
+            }
+        },
+
+        removeNFT({commit, state}, tokenId) {
+            var NFTList = state.nft;
+            const index = NFTList.findIndex(obj => {
+                return obj.tokenId === tokenId
+            });
+
+            // If item is found...
+            if (index) {
+                // Remove it!
+                NFTList.splice(index, 1);
+                commit('update_nft', NFTList);
+            }
+        },
+
+        addNFT({commit, state}, tokenId) {
+            var NFTList = state.nft;
+
+            // Get the state of the NFT.
+            state.contract.methods.getSeller(tokenId).call().then(async (owner) => {
+
+                // The owner owns this NFT!! Get the NFT information.
+                if(owner.toLowerCase() === state.userId.toLowerCase()) {
+
+                    const IPFSHash = await state.contract.methods.getURI(i).call();
+
+                    var newNFT = {
+                        URI: IPFSHash,
+                        URL: `${import.meta.env.VITE_GATEWAY_PRE}${IPFSHash}${import.meta.env.VITE_GATEWAY_POST}`,
+                        owner: (await state.contract.methods.getSeller(tokenId).call()).toLowerCase(),
+                        selling: await state.contract.methods.isSelling(tokenId).call(),
+                        tokenId: tokenId,
+                        price: Number(await state.contract.methods.getPrice(tokenId).call())        // Price in Wei. Divide by 10^-18 to get MATIC/Gwei.
+                    };
+
+                    NFTList.push(newNFT);
+                    commit('update_nft', NFTList);
+                }
+            });
+        },
+
+        updateNFT({commit, state}, tokenId) {
+            var NFTList = state.nft;
+            const index = NFTList.findIndex(obj => {
+                return obj.tokenId === tokenId
+            });
+
+            // Get the updated NFT information from the smart contract, and update the store.
+            state.contract.metods.getURI(tokenId).call().then(async (IPFSHash) => {
+                NFTList[index] = {
+                    URI: IPFSHash,
+                    URL: `${import.meta.env.VITE_GATEWAY_PRE}${IPFSHash}${import.meta.env.VITE_GATEWAY_POST}`,
+                    owner: (await state.contract.methods.getSeller(i).call()).toLowerCase(),
+                    selling: await state.contract.methods.isSelling(i).call(),
+                    tokenId: i,
+                    price: Number(await state.contract.methods.getPrice(i).call())        // Price in Wei. Divide by 10^-18 to get MATIC/Gwei.
+                };
+
+                commit("update_nft", NFTList);
+            })
+        },
+
+        updateNFTPrice({commit, state}, tokenId, price) {
+            var NFTList = state.nft;
+            const index = NFTList.findIndex(obj => {
+                return obj.tokenId === tokenId
+            });
+
+            NFTList[index].price = price;
+            commit("update_nft", NFTList);
+        },
+
+        updateNFTSell({commit, state}, tokenId, sellingStatus) {
+            var NFTList = state.nft;
+            const index = NFTList.findIndex(obj => {
+                return obj.tokenId === tokenId
+            });
+
+            NFTList[index].selling = sellingStatus;
+            commit("update_nft", NFTList);
         }
     },
     // Getters store computed properties.
@@ -175,5 +302,8 @@ export default createStore({
         gasFee: function(state) {
             return state.gasFee;
         },
+        nft: function(state) {
+            return state.nft;
+        }
     }
 })

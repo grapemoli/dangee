@@ -40,7 +40,6 @@ const loginWithEth = async () => {
           .then(async (accounts) => accounts[0])
           .catch((err) => {
             // Throws this error if the user cancels the login prompt.
-            alert(err)
             throw Error("Please select an account");
           });
 

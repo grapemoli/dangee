@@ -19,7 +19,7 @@ const disabled = ref(true);
 
 // For progress bar.
 const loadingStyle = ref('display: none;');
-const overlayStyle = ref('display: none;');
+const blocked = ref(false);
 
 // For form inputs.
 const price = ref(null);
@@ -106,7 +106,7 @@ async function mint() {
   toast.add({ severity: "info", summary: "Minting", detail: `Please stay on this page while your ITM is minting!`, life: 3000 });
 
   loadingStyle.value = 'display: block';
-  overlayStyle.value = 'display: block';
+  blocked.value = true;
 
   var IPFSHash = '';
   try {
@@ -151,12 +151,12 @@ async function mint() {
           // Toast-inform the user that the minting was successful.
           // We don't do it here because the TopBanner already listens for the emitted NewItem event.
           loadingStyle.value = 'display: none';
-          overlayStyle.value = 'display: none';
+          blocked.value = false;
         })
         .catch(async (err) => {
 
           loadingStyle.value = 'display: none';
-          overlayStyle.value = 'display: none';
+          blocked.value = false;
 
           // Unpin the image
           const response = await fetch(`https://api.pinata.cloud/pinning/unpin/${IPFSHash}`,
@@ -180,7 +180,7 @@ async function mint() {
   catch (err) {
 
     loadingStyle.value = 'display: none';
-    overlayStyle.value = 'display: none';
+    blocked.value = false;
 
     // Unpin the image.
     const response = await fetch(
@@ -290,7 +290,7 @@ async function mint() {
               <div class="card flex justify-content-center field p-fluid">
 
                 <!-- Price input. Minimum is 1 Wei (10^-18 MATIC), with no upper maximum. -->
-                <FloatLabel>
+                <FloatLabel style="width:100%;">
                   <label for="price"> Price (MATIC) </label>
                   <InputNumber v-model="price" inputId="price" :min="0.000000000000000001" :minFractionDigits="0" :maxFractionDigits="18" />
                 </FloatLabel>
@@ -360,9 +360,8 @@ async function mint() {
   </div>
 
   <!-- Progress Spinner. -->
-  <div class="overlay" :style="overlayStyle"></div>
-
   <!-- Loading for if the user is minting an NFT -->
+  <BlockUI :blocked="blocked" fullScreen />
   <div class="card flex justify-content-center">
     <ProgressSpinner class="progress-spinner" :style="loadingStyle"/>
   </div>
@@ -398,17 +397,5 @@ async function mint() {
 
 .form {
   position: relative;
-}
-
-.overlay {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.5);
-  z-index: 2;
 }
 </style>

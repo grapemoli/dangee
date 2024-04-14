@@ -1,6 +1,5 @@
 const { expect } = require ("chai");
 const { ethers } = require ("hardhat");
-const { BigNumber } = require("bignumber.js");
 
 describe ("Item Contract", function () {
     describe ("ROLE: Minting by users with MINT_ROLE", function () {
@@ -43,11 +42,20 @@ describe ("Item Contract", function () {
             expect (await ItemContract.connect (other).canMint ()).to.equal (false);
         });
 
-        it ("MINT_ROLE can be granted to non-minters", async function () {
+        it ("MINT_ROLE can be granted to non-minters by admin", async function () {
             const [owner, other] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
 
             await ItemContract.grantMintRole (other);
+
+            expect (await ItemContract.connect (other).canMint ()).to.be.equal (true);
+        });
+
+        it ("MINT_ROLE can be granted to non-minters by regular user", async function () {
+            const [owner, other] = await ethers.getSigners ();
+            const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
+
+            await ItemContract.connect (other).grantMintRole (other);
 
             expect (await ItemContract.connect (other).canMint ()).to.be.equal (true);
         });
@@ -59,7 +67,7 @@ describe ("Item Contract", function () {
             const tokenURI = "test_nft";
             const tokenId = await ItemContract.totalItems ();
 
-            await ItemContract.grantMintRole (other);
+            await ItemContract.connect (other).grantMintRole (other);
 
             await expect (ItemContract.connect (other).safeMint (minter, tokenURI))
                 .to.emit (ItemContract, "NewItem")
@@ -227,6 +235,55 @@ describe ("Item Contract", function () {
             expect (await ItemContract.getPrice (tokenId)).to.be.equal (1234);
         });
 
+        it ("Should be able to update both price and selling", async function (){
+            const [owner] = await ethers.getSigners ();
+            const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
+
+            const tokenURI = "test_nft";
+            const tokenId = await ItemContract.totalItems ();
+            const price = 110;
+
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
+            await ItemContract.updateAll (tokenId, 1234, false);
+
+            expect (await ItemContract.getPrice (tokenId)).to.be.equal (1234);
+            expect (await ItemContract.isSelling (tokenId)).to.be.equal (false);
+        });
+
+        it ("Should emit ItemNotForSale and PriceUpdate events when updating price and selling", async function (){
+            const [owner] = await ethers.getSigners ();
+            const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
+
+            const tokenURI = "test_nft";
+            const tokenId = await ItemContract.totalItems ();
+            const price = 110;
+
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
+
+            await expect (ItemContract.updateAll (tokenId, price+1, false))
+                .to.emit (ItemContract, "ItemNotForSale")
+                .withArgs (owner, tokenId, price+1)
+                .and.to.emit (ItemContract, "PriceUpdate")
+                .withArgs (owner, tokenId, price, price+1);
+        });
+
+        it ("Should emit ItemForSale and PriceUpdate events when updating price and selling", async function (){
+            const [owner] = await ethers.getSigners ();
+            const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
+
+            const tokenURI = "test_nft";
+            const tokenId = await ItemContract.totalItems ();
+            const price = 110;
+
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, true);
+
+            await expect (ItemContract.updateAll (tokenId, price+1, true))
+                .to.emit (ItemContract, "ItemForSale")
+                .withArgs (owner, tokenId, price+1)
+                .and.to.emit (ItemContract, "PriceUpdate")
+                .withArgs (owner, tokenId, price, price+1);
+        });
+
         it ("Should not be able to update price if updating to the same price", async function () {
             const [owner] = await ethers.getSigners ();
             const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
@@ -293,6 +350,21 @@ describe ("Item Contract", function () {
 
             await expect (ItemContract.setSelling (tokenId, true))
                 .to.emit (ItemContract, "ItemForSale")
+                .withArgs (owner, tokenId, price);
+        });
+
+        it ("Should fire ItemNotForSale event", async function (){
+            const [owner] = await ethers.getSigners ();
+            const ItemContract = await ethers.deployContract ("Item", [owner, owner]);
+
+            const tokenURI = "test_nft";
+            const tokenId = await ItemContract.totalItems ();
+            const price = 110;
+
+            await ItemContract.safeMintWithPrice (owner, tokenURI, price, false);
+
+            await expect (ItemContract.setSelling (tokenId, false))
+                .to.emit (ItemContract, "ItemNotForSale")
                 .withArgs (owner, tokenId, price);
         });
 

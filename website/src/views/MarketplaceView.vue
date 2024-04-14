@@ -46,29 +46,6 @@ const sortOptions = ref([
 const NFTList = ref([
 ]);
 
-const tabMenuItems = ref([
-  {
-    label: 'NFT Marketplace',
-    icon: 'pi pi-chart-bar',
-    route: '/marketplace'
-  },
-  {
-    label: 'Library',
-    icon: 'pi pi-shop',
-    route: '/marketplace'
-  },
-  {
-    label: 'Sell',
-    icon: 'pi pi-bitcoin',
-    route: '/marketplace',
-  },
-  {
-  label: 'Mint',
-    icon: 'pi pi-images',
-    route: '/mint',
-  }
-]);
-
 
 // Get the NFTs from the smart contract.
 onBeforeMount(() => {
@@ -292,7 +269,7 @@ function buyNFT(NFT) {
 
             // Note that we divide by 10^-18 because the price is in Wei. 10^18 Wei = 1 GWei = 1 MATIC.
             // Total cost = (NFTCostWei) + (GasCostWei) = (NFTCostWei) + (Gas + GasPriceGWei * Wei/GWei)
-            const transactionValue = (NFT.price) + (gas * store.getters['gasFee'].FastGasPrice * 1000000000);
+            const transactionValue = ((NFT.price) + (gas * store.getters['gasFee'].FastGasPrice * 1000000000))*2;
 
 
             // Price in GWei/MATIC, vs. the price of the user's balance in GWei/MATIC.
@@ -314,9 +291,6 @@ function buyNFT(NFT) {
 
                     if (err.code === 4001) {
                       err.message = err.message.replace('MetaMask Tx Signature: ', '');
-                    }
-                    else if (err.toString.indexOf('Transaction was not mined within 50 blocks') > -1) {
-                      err = {message: 'This purchase may take awhile.'};
                     }
                     else {
                       err = err.toString()
@@ -447,7 +421,7 @@ function reload() {
       </template>
 
       <!-- Actual DataView: List View -->
-      <template #list="slotProps" class="font-overflow" :display="displayGrid">
+      <template #list="slotProps" class="font-overflow">
         <div class="grid grid-nogutter font-overflow">
           <div v-for="(item, index) in slotProps.items" :key="index" class="col-12">
             <div class="flex flex-column sm:flex-row sm:align-items-center p-4 gap-3" :class="{ 'border-top-1 surface-border': index !== 0 }">
@@ -458,7 +432,7 @@ function reload() {
               <div class="flex flex-column md:flex-row justify-content-between md:align-items-center flex-1 gap-4">
                 <div class="flex flex-row md:flex-column justify-content-between align-items-start gap-2">
                   <div>
-                    <span class="font-medium text-secondary text-sm" style="padding:5%;">ITM #{{ item.tokenId }}</span>
+                    <div class="text-lg font-medium text-900 mt-2" style="padding:5%;">ITM #{{item.tokenId}}</div>
                   </div>
                   <div class="surface-100 p-1" style="border-radius: 30px">
                     <div class="surface-0 flex align-items-center gap-2 justify-content-center py-1 px-2" style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)">
@@ -480,7 +454,7 @@ function reload() {
       </template>
 
       <!-- Actual Dataview: Grid View -->
-      <template #grid="slotProps" :display="displayGrid">
+      <template #grid="slotProps">
         <div class="grid grid-nogutter">
           <div v-for="(item, index) in slotProps.items" :key="index" class="col-12 sm:col-6 md:col-4 xl:col-6 p-2">
             <div class="p-4 border-1 surface-border surface-card border-round flex flex-column">
@@ -493,7 +467,7 @@ function reload() {
               <div class="pt-4 font-overflow">
                 <div class="flex flex-row justify-content-between align-items-start gap-2">
                   <div>
-                    <span class="font-overflow font-medium text-secondary text-sm">ITM #{{ item.tokenId }}</span>
+                    <div class="text-lg font-medium text-900 mt-2" style="padding:5%;">ITM #{{item.tokenId}}</div>
                   </div>
                   <div class="surface-100 p-1 font-overflow" style="border-radius: 30px">
                     <div class="surface-0 flex align-items-center gap-2 justify-content-center py-1 px-2" style="border-radius: 30px; box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)">
@@ -505,7 +479,7 @@ function reload() {
                 <div class="flex flex-column gap-4 mt-4">
                   <span class="font-overflow text-2xl font-semibold text-900" v-text="`${item.price * 0.000000000000000001} MATIC`"></span>
                   <div class="flex gap-2">
-                    <Button icon="pi pi-shopping-cart" label="Buy Now" @click="buyNFT(item)" :disabled="!item.selling ? true : (item.owner === store.getters['userId'])" class="flex-auto md:flex-initial white-space-nowrap"></Button>
+                    <Button icon="pi pi-shopping-cart" label="Buy Now" @click="buyNFT(item)" :disabled="!item.selling ? true : (item.owner === store.getters['userId'])" class="flex-auto md:flex-initial white-space-nowrap" style="width:100%;"></Button>
                   </div>
                 </div>
               </div>

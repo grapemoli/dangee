@@ -28,34 +28,46 @@ const web3 = new Web3((window.ethereum && window.ethereum.isMetaMask) ? window.e
 store.state.contract = new web3.eth.Contract(JSON.parse(store.state.abi), store.state.contractId);
 store.state.websocket = new web3socket.eth.Contract(JSON.parse(store.state.abi), store.state.contractId);
 
+
 // Set the information if the user exists.
 store.dispatch('updateBalance');
 store.dispatch('updateMinter');
 store.dispatch('updateGasFee');
+store.dispatch('updateNFTList');
+
 
 // PrimeVue Assets for the application.
 import 'primeicons/primeicons.css';
 import PrimeVue from 'primevue/config';
 
 import Button from "primevue/button";
+import BlockUI from 'primevue/blockui';
 import Card from 'primevue/card';
+import Carousel from 'primevue/carousel';
 import DataView from 'primevue/dataview';
 import DataViewLayoutOptions from 'primevue/dataviewlayoutoptions';
+import Dialog from 'primevue/dialog';
 import Divider from 'primevue/divider';
 import Dropdown from 'primevue/dropdown';
+import FileUpload from 'primevue/fileupload';
+import FloatLabel from 'primevue/floatlabel';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import InputNumber from 'primevue/inputnumber';
+import InputSwitch from 'primevue/inputswitch';
 import Image from 'primevue/image';
 import Menubar from 'primevue/menubar';
 import Paginator from 'primevue/paginator';
 import ProgressSpinner from 'primevue/progressspinner';
+import Skeleton from 'primevue/skeleton';
+import SpeedDial from 'primevue/speeddial';
+import Steps from 'primevue/steps';
+import Stepper from 'primevue/stepper';
+import StepperPanel from 'primevue/stepperpanel';
 import TabMenu from "primevue/tabmenu";
 import Tag from 'primevue/tag';
 import ToggleButton from 'primevue/togglebutton';
 import Tooltip from 'primevue/tooltip';
-import Skeleton from 'primevue/skeleton';
-import SpeedDial from 'primevue/speeddial';
-import Steps from 'primevue/steps';
 
 import ConfirmDialog from 'primevue/confirmdialog';
 import ConfirmationService from 'primevue/confirmationservice';
@@ -69,13 +81,20 @@ app.use(PrimeVue, {
 });
 
 app.component('Button', Button);
+app.component('BlockUI', BlockUI);
 app.component('Card', Card);
+app.component('Carousel', Carousel);
 app.component('DataView', DataView);
 app.component('DataViewLayoutOptions', DataViewLayoutOptions);
+app.component('Dialog', Dialog);
 app.component('Divider', Divider);
 app.component('Dropdown', Dropdown);
+app.component('FileUpload', FileUpload);
+app.component('FloatLabel', FloatLabel);
 app.component('IconField', IconField);
 app.component('InputIcon', InputIcon);
+app.component('InputNumber', InputNumber);
+app.component('InputSwitch', InputSwitch);
 app.component('Image', Image);
 app.component('Menubar', Menubar);
 app.component('Paginator', Paginator);
@@ -83,6 +102,8 @@ app.component('ProgressSpinner', ProgressSpinner);
 app.component('Skeleton', Skeleton);
 app.component('SpeedDial', SpeedDial);
 app.component('Steps', Steps);
+app.component('Stepper', Stepper);
+app.component('StepperPanel', StepperPanel);
 app.component('Tag', Tag);
 app.component('ToggleButton', ToggleButton);
 

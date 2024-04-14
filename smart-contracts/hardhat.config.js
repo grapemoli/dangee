@@ -15,6 +15,10 @@ module.exports = {
     localhost: {
       url: "http://127.0.0.1:8545"
     },
+    polygon: {
+      url: "https://polygon-rpc.com/",
+      accounts: [process.env.PRIVATE_KEY_REAL, process.env.PRIVATE_KEY_REAL_2]
+    },
   },
   etherscan: {
     apiKey: process.env.POLYGONSCAN_API_KEY

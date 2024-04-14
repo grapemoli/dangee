@@ -46,6 +46,7 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
     event NewItem (address sender, uint256 tokenId, uint256 price);
     event PriceUpdate (address owner, uint256 indexed tokenId, uint256 oldPrice, uint256 newPrice);
     event ItemForSale (address seller, uint256 indexed tokenId, uint256 price);
+    event ItemNotForSale (address seller, uint256 indexed tokenId, uint256 price);
     event ItemSold (address seller, address buyer, uint256 indexed tokenId, uint256 price);
 
 
@@ -97,6 +98,34 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
         if (_sell == true) {
             emit ItemForSale (msg.sender, tokenId, _listingMap [tokenId].price);
         }
+        else {
+            emit ItemNotForSale (msg.sender, tokenId, _listingMap [tokenId].price);
+        }
+    }
+
+    // A combination of setSelling() and updatePrice().
+    function updateAll (uint256 tokenId, uint newPrice, bool _sell) public {
+        // Only the owner can allow the NFT to be sold.
+        require (msg.sender == ownerOf (tokenId) || hasRole (DEFAULT_ADMIN_ROLE, msg.sender), "You are not the owner of this NFT");
+
+        // The set price must be greater than 0 and a different price.
+        require (newPrice > 0, "Please set a price greater than 0.");
+        require (newPrice != _listingMap [tokenId].price, "Already this price.");
+
+        // Set the values.
+        uint256 oldPrice = _listingMap [tokenId].price;
+        _listingMap [tokenId].selling = _sell;
+        _listingMap [tokenId].price = newPrice;
+
+        // Emit events.
+        emit PriceUpdate (payable (msg.sender), tokenId, oldPrice, newPrice);
+
+        if (_sell == true) {
+            emit ItemForSale (msg.sender, tokenId, _listingMap [tokenId].price);
+        }
+        else {
+            emit ItemNotForSale (msg.sender, tokenId, _listingMap [tokenId].price);
+        }
     }
 
 
@@ -105,7 +134,9 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
     // NFTs metadata on the blockchain, we store the IPFS hash relating to the NFT.
     function safeMint (address to, string memory uri) public onlyRole (MINTER_ROLE) {
         // Before minting, that we don't already have the max number of NFTs on the platform.
-        require (_nextTokenId <  (2^256 - 1), 'Reached max number of NFTs');
+        // The max is 1001 because we store images on Pinata API, whose free-tier only allows for
+        // up to 1000 pictures.
+        require (_nextTokenId < 1000, 'Reached max number of NFTs');
 
         uint256 tokenId = _nextTokenId++;   // Note that the order is (1) tokenId=_nextTokenId, (2) increment
         _safeMint (to, tokenId);
@@ -122,7 +153,7 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
     // caller can also choose whether or not to have the NFT be sellable on the market.
     function safeMintWithPrice (address to, string memory uri, uint256 price, bool onMarket) public onlyRole (MINTER_ROLE) {
         // Before minting, that we don't already have the max number of NFTs on the platform.
-        require (_nextTokenId <  (2^256 - 1), 'Reached max number of NFTs.');
+        require (_nextTokenId < 1000, 'Reached max number of NFTs.');
         require (price > 0, 'Price should be greater than 0.');
 
         uint256 tokenId = _nextTokenId++;   // Note that the order is (1) tokenId=_nextTokenId, (2) increment
@@ -162,9 +193,9 @@ contract Item is ERC721, ERC721URIStorage, AccessControl {
 
 
     // **** ADMIN / ROLE-RELATED **** //
-    // Only the admin can grant users access to minting.
-    function grantMintRole (address newMinter) public onlyRole (DEFAULT_ADMIN_ROLE) {
-        grantRole (MINTER_ROLE, newMinter);
+    // Any user can be granted the minted role.
+    function grantMintRole (address newMinter) public {
+        _grantRole (MINTER_ROLE, newMinter);
     }
 
     // Returns a boolean of if the user can mint or not.
